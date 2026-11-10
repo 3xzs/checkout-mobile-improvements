@@ -1,0 +1,17 @@
+/* mobile-frame.css
+   Constrains every page to a phone-sized column centered on a neutral desktop background.
+   Link this in every HTML file — it is the single source of the mobile-only constraint. */
+
+html {
+  background: #d8d8d8;
+}
+
+body {
+  max-width: 430px;
+  margin: 0 auto;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.22);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  background: #fff;
+}
