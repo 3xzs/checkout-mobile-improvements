@@ -4,6 +4,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="mobile-frame.css">
 <link rel="stylesheet" href="mobile-fixes.css">
+<link rel="stylesheet" href="sticky-cta.css">
 
 <style>
   :root {
@@ -741,3 +742,31 @@
     </div>
   </div>
 </div>
+
+<!-- Sticky bottom CTA -->
+<div class="sticky-cta">
+  <div class="sticky-cta-summary" onclick="toggleCTADetail()">
+    <span class="sticky-cta-summary-label" id="cta-label">
+      Bestellung (3 Artikel)
+      <svg id="cta-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="#111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+    <span class="sticky-cta-summary-total">702,46 €</span>
+  </div>
+  <div class="sticky-cta-detail" id="cta-detail">
+    <div class="sticky-cta-detail-row"><span>Bruttopreis</span><span>702,46 €</span></div>
+    <div class="sticky-cta-detail-row"><span>Versand</span><span style="color:#16a34a">Kostenfrei</span></div>
+    <div class="sticky-cta-detail-row total"><span>Gesamtpreis</span><span>702,46 €</span></div>
+  </div>
+  <button class="sticky-cta-btn" onclick="location.href='checkout-step4.html'">
+    Bestellung prüfen
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+</div>
+<script>
+function toggleCTADetail() {
+  var d = document.getElementById("cta-detail");
+  var l = document.getElementById("cta-label");
+  d.classList.toggle("open");
+  l.classList.toggle("open");
+}
+</script>
