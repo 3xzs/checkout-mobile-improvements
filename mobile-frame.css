@@ -8,7 +8,8 @@ html {
 
 body {
   max-width: 430px;
-  margin: 0 auto;
+  /* !important: each page's inline <style> resets body margin to 0, which left-aligned the frame */
+  margin: 0 auto !important;
   box-shadow: 0 0 60px rgba(0, 0, 0, 0.22);
   min-height: 100vh;
   overflow-x: hidden;
