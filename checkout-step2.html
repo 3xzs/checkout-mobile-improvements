@@ -424,6 +424,74 @@
   }
   .toggle-track.active .toggle-thumb { left: 18px; }
 
+  /* ── Form fields (same as step 1) ── */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .form-grid.cols-3 {
+    grid-template-columns: 2fr 1fr;
+  }
+
+  .form-grid.cols-zip {
+    grid-template-columns: 160px 1fr;
+  }
+
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+  }
+
+  .field-wrap {
+    position: relative;
+    border: 1px solid var(--c-border-control);
+    border-radius: var(--radius-xs);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    transition: border-color 0.15s;
+  }
+
+  .field-wrap:focus-within {
+    border-color: var(--accent);
+  }
+
+  .field-label {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: var(--fg-muted);
+    pointer-events: none;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .field-label.floating {
+    top: 8px;
+    transform: none;
+    font-size: 10px;
+    color: var(--fg-faint);
+  }
+
+  .field-input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--fg);
+    padding: 20px 10px 6px;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
   /* ── Save address checkbox ── */
   .save-addr-check {
     display: flex;
@@ -438,7 +506,7 @@
 </style>
 
 <script>
-  let sameAsBilling = false;
+  let sameAsBilling = true;
   function toggleSameAsBilling() {
     sameAsBilling = !sameAsBilling;
     document.getElementById('billing-toggle').classList.toggle('active', sameAsBilling);
@@ -553,14 +621,14 @@
 
         <!-- Same as billing toggle -->
         <label class="same-as-billing" id="same-billing-label">
-          <div class="toggle-track" id="billing-toggle" onclick="toggleSameAsBilling()">
+          <div class="toggle-track active" id="billing-toggle" onclick="toggleSameAsBilling()">
             <div class="toggle-thumb"></div>
           </div>
           <span>Gleich wie Rechnungsadresse</span>
         </label>
 
         <!-- Saved address cards (hidden when "same as billing" is active) -->
-        <div id="address-selector">
+        <div id="address-selector" style="display:none;">
           <div class="address-option selected" onclick="selectAddress(this)">
             <div class="radio-circle"><div class="radio-dot"></div></div>
             <div class="address-text">
