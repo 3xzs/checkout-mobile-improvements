@@ -1,0 +1,37 @@
+/* mobile-fixes.css
+   Base fixes for layouts that overflow or are too cramped at 430px.
+   Applied on top of the original styles — does not remove existing rules. */
+
+/* Form grids: .cols-3 and .cols-zip use fixed column widths that overflow on mobile */
+.cols-3,
+.cols-zip {
+  grid-template-columns: 1fr !important;
+}
+
+/* Step 4 items table: add horizontal scroll so it doesn't clip */
+.items-table,
+.order-items,
+table {
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Touch targets: bump minimum tap height to 44px on interactive elements */
+button,
+a,
+.radio-card,
+.saved-addr-card,
+.payment-option,
+.shipping-option,
+select,
+input[type="checkbox"],
+input[type="radio"] {
+  min-height: 44px;
+}
+
+/* Prevent text from overflowing narrow containers */
+p, span, label, td, th {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}

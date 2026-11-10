@@ -1,0 +1,827 @@
+<title>Conrad – Bestellübersicht</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="mobile-frame.css">
+<link rel="stylesheet" href="mobile-fixes.css">
+
+<style>
+  :root {
+    --c-blue: #376EEF;
+    --c-blue-hover: #2856c9;
+    --c-navy: #001F42;
+    --c-page-bg: #F4F5F7;
+    --c-text: #272C35;
+    --c-text-on-dark: #FEFEFF;
+    --c-text-secondary: #5a6171;
+    --c-text-tertiary: #666c7a;
+    --c-border: #cfd4dd;
+    --c-border-control: #b6bcc7;
+    --c-border-strong: #6f7787;
+    --c-bg-white: #ffffff;
+    --c-bg-tint: #f8f9fb;
+    --c-success: #218972;
+    --c-success-bg: #E0F4EE;
+    --c-danger: #d9234c;
+    --c-blue-tint-soft: #F4F5FE;
+    --radius: 8px;
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius-pill: 999px;
+    --radius-lg: 12px;
+    --bg: var(--c-page-bg);
+    --surface: var(--c-bg-white);
+    --fg: var(--c-text);
+    --fg-muted: var(--c-text-secondary);
+    --fg-faint: var(--c-text-tertiary);
+    --border: var(--c-border);
+    --accent: var(--c-blue);
+    --accent-hover: var(--c-blue-hover);
+    --green: var(--c-success);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.5;
+  }
+
+  /* ── Topbar ── */
+  .topbar { background: var(--c-blue); color: var(--c-text-on-dark); font-size: 12px; padding: 6px max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .topbar-inner { max-width: 1680px; margin: 0 auto; display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; }
+  .topbar-item { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+
+  /* ── Header ── */
+  .header { background: var(--c-navy); color: var(--c-text-on-dark); padding: 16px 0; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; }
+  .header-inner { max-width: 1680px; margin: 0 auto; padding: 0 max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); display: flex; align-items: center; justify-content: space-between; }
+  .logo { display: inline-flex; align-items: center; flex-shrink: 0; }
+  .logo svg { width: 130px; height: auto; display: block; }
+  .secure-badge { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--c-text-on-dark); opacity: 0.85; }
+  .secure-badge svg { width: 18px; height: 18px; }
+
+  /* ── Main layout ── */
+  .main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 28px max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  @media (max-width: 768px) {
+    .main { grid-template-columns: 1fr; }
+    .topbar-inner { gap: 12px; }
+  }
+
+  /* ── Checkout accordion steps ── */
+  .checkout-steps { display: flex; flex-direction: column; gap: 0; }
+
+  .step-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--fg);
+    cursor: pointer;
+  }
+
+  .step-card.active .step-header {
+    background: var(--c-blue);
+    color: var(--c-text-on-dark);
+  }
+
+  .step-header .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: var(--radius-pill);
+    border: 2px solid currentColor;
+    font-size: 12px;
+    font-weight: 700;
+    margin-right: 10px;
+    flex-shrink: 0;
+  }
+
+  .step-card.active .step-header .step-num {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.5);
+  }
+
+  .step-body {
+    padding: 24px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .step-card:not(.active) .step-body { display: none; }
+
+  /* ── Form styles ── */
+  .form-hint {
+    text-align: right;
+    font-size: 12px;
+    color: var(--fg-muted);
+    margin-bottom: 16px;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .form-grid.cols-3 {
+    grid-template-columns: 2fr 1fr;
+  }
+
+  .form-grid.cols-zip {
+    grid-template-columns: 160px 1fr;
+  }
+
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+  }
+
+  .form-field.full { grid-column: 1 / -1; }
+
+  .field-wrap {
+    position: relative;
+    border: 1px solid var(--c-border-control);
+    border-radius: var(--radius-xs);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    transition: border-color 0.15s;
+  }
+
+  .field-wrap:focus-within {
+    border-color: var(--accent);
+  }
+
+  .field-wrap.valid {
+    border-color: var(--c-border-control);
+  }
+
+  .field-label {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: var(--fg-muted);
+    pointer-events: none;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .field-label.floating {
+    top: 8px;
+    transform: none;
+    font-size: 10px;
+    color: var(--fg-faint);
+  }
+
+  .field-input, .field-select {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--fg);
+    padding: 20px 10px 6px;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .field-select {
+    cursor: pointer;
+    padding-right: 32px;
+  }
+
+  .select-arrow {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--fg-muted);
+  }
+
+  .field-check {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .field-counter {
+    font-size: 11px;
+    color: var(--fg-faint);
+    text-align: right;
+    margin-top: 2px;
+    padding-right: 2px;
+  }
+
+  .form-row { margin-bottom: 12px; }
+
+  /* ── Next button ── */
+  .btn-next {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-xs);
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: 20px;
+    float: right;
+  }
+
+  .btn-next:hover { background: var(--accent-hover); }
+
+  /* ── Order summary (right column) ── */
+  .order-summary {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 20px;
+  }
+
+  .summary-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+
+  .summary-count {
+    font-size: 13px;
+    color: var(--fg-muted);
+    margin-bottom: 16px;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .summary-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 12px 0;
+  }
+
+  .summary-row.total {
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  .summary-vat {
+    font-size: 12px;
+    color: var(--fg-muted);
+    margin-top: 2px;
+  }
+
+  .summary-free { color: var(--green); font-weight: 600; }
+
+  .summary-legal {
+    font-size: 11px;
+    color: var(--fg-muted);
+    margin-top: 16px;
+    line-height: 1.6;
+  }
+
+  .summary-legal a { color: var(--accent); text-decoration: none; }
+  .summary-legal a:hover { text-decoration: underline; }
+
+  /* ── Internal reference section ── */
+  .ref-section {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-top: 20px;
+    margin-bottom: 0;
+    overflow: hidden;
+  }
+  .ref-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    background: var(--c-bg-tint);
+    border: none;
+    padding: 11px 14px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--fg-muted);
+    cursor: pointer;
+    text-align: left;
+  }
+  .ref-toggle:hover { color: var(--fg); }
+  .ref-toggle .chevron { transition: transform .2s; flex-shrink: 0; margin-right: 2px; }
+  .ref-section.open .ref-toggle .chevron { transform: rotate(180deg); }
+  .ref-body {
+    padding: 16px;
+    border-top: 1px solid var(--border);
+    display: block;
+  }
+  .ref-hint { font-size: 12px; color: var(--fg-muted); margin: 8px 0 0; }
+
+  /* ── Saved billing address cards ── */
+  .saved-addr-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .saved-bill-card {
+    border: 1.5px solid var(--c-border-control);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    cursor: pointer;
+    position: relative;
+    transition: border-color .15s;
+    background: var(--surface);
+  }
+  .saved-bill-card:hover { border-color: var(--c-border-strong); }
+  .saved-bill-card.selected { border-color: var(--accent); background: var(--c-blue-tint-soft); }
+  .saved-bill-card.new-card {
+    border-style: dashed;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: var(--fg-muted);
+    font-size: 13px;
+    font-weight: 500;
+    min-height: 90px;
+  }
+  .saved-bill-card.new-card:hover { color: var(--fg); border-color: var(--c-border-strong); }
+  .saved-bill-name { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+  .saved-bill-addr { font-size: 12px; color: var(--fg-muted); line-height: 1.5; }
+  .saved-bill-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: var(--radius-xs);
+    background: var(--c-navy);
+    color: var(--c-text-on-dark);
+    margin-bottom: 6px;
+  }
+  .card-check {
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .saved-bill-card.selected .card-check { display: flex; }
+
+  /* Divider between saved cards and form */
+  .addr-form-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    font-size: 12px;
+    color: var(--fg-muted);
+  }
+  .addr-form-divider::before,
+  .addr-form-divider::after {
+    content: '';
+    flex: 1;
+    border-top: 1px solid var(--border);
+  }
+</style>
+
+<!-- Top announcement bar -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-item">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5L5 9.5L11 3.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Plattform für alles Technische
+    </div>
+    <div class="topbar-item">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5L5 9.5L11 3.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Lieferungen in 24h
+    </div>
+    <div class="topbar-item">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5L5 9.5L11 3.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Große Auswahl, eine Rechnung
+    </div>
+    <div class="topbar-item">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5L5 9.5L11 3.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Garantiertes Rückgaberecht
+    </div>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-inner">
+    <a href="index.html" class="logo" aria-label="Conrad">
+      <svg width="160" height="40" viewBox="0 0 160 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_5005_27010)">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M37.7528 0L36.1809 6.88901H26.1698C16.9036 6.88901 11.8011 12.8209 11.8011 23.592C11.8011 30.5305 14.7584 33.1104 22.7123 33.1104H30.26L28.7167 40H15.5869C3.94266 40 0 36.3155 0 25.4795C0 16.6882 2.78962 8.76173 7.33826 4.55168C10.7957 1.36311 15.7071 0 23.7738 0H37.7528ZM39.3954 9.77778C46.1119 9.77778 48.5393 11.7969 48.5393 17.3328C48.5393 25.5503 43.8927 30.2212 35.7373 30.2212L23.4066 30.2222C16.6906 30.2222 14.382 28.463 14.382 23.3874C14.382 14.5638 18.7593 9.77778 26.7948 9.77778H39.3954ZM62.4173 9.77778L68.2557 21.5714L71.087 9.77778H79.1011L74.2156 30.2222H65.8731L58.8715 16.67L55.654 30.2222H47.6404L52.4967 9.77778H62.4173ZM96.6532 9.77778C103.594 9.77778 106.358 11.565 106.358 16.0066C106.358 20.1002 103.714 22.7535 98.696 23.7633L101.955 27.6459L110.708 16.093C115.223 10.109 115.616 9.79206 122.183 9.77834L133.034 9.77778L128.107 30.2222H119.633L120.504 26.5608H111.581L108.935 30.2222H100.47C95.7216 30.2222 95.5112 30.1077 93.1378 26.329L89.081 19.7836H95.0009C97.3438 19.7836 98.4857 18.8619 98.4857 17.0158C98.4857 15.7181 97.2241 15.026 94.8195 15.026H89.4427L85.7759 30.2222H77.3034L82.2305 9.77778H96.6532ZM151.633 9.77778C157.499 9.77778 160 11.9983 160 17.2465C160 25.7239 155.772 30.2222 147.82 30.2222H130.337L135.193 9.77778H151.633ZM29.7026 15.1981C25.3553 15.1981 22.8566 17.6208 22.8566 22.0329C22.8566 24.541 24.0369 25.2914 27.7833 25.2914L33.2493 25.292C37.3567 25.292 39.5759 22.8396 39.5759 18.2556C39.5759 15.8329 38.6768 15.1986 35.2291 15.1986L29.7026 15.1981ZM147.104 15.026H142.341L139.957 24.9751H145.676C149.19 24.9751 151.393 22.3796 151.393 18.2557C151.393 15.7181 150.47 15.026 147.104 15.026ZM123.019 15.026H122.449C119.834 15.026 119.293 15.3431 117.49 17.9678L114.967 21.5714H121.457L123.019 15.026Z" fill="#FEFEFF"></path>
+</g>
+<defs>
+<clipPath id="clip0_5005_27010">
+<rect width="160" height="40" fill="white"></rect>
+</clipPath>
+</defs>
+</svg>
+    </a>
+    <div class="secure-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Sicher einkaufen
+    </div>
+  </div>
+</header>
+
+<!-- Main -->
+<div class="main">
+  <!-- Left: Checkout steps -->
+  <div class="checkout-steps">
+
+    <!-- Step 1: Rechnungsadresse (active) -->
+    <div class="step-card active">
+      <div class="step-header">
+        <span class="step-num">1</span>
+        Rechnungsadresse
+      </div>
+      <div class="step-body">
+
+        <!-- Saved billing addresses -->
+        <div class="saved-addr-grid">
+
+          <div class="saved-bill-card selected" onclick="selectBillingAddr(this, 'Herr', 'Simon', 'Gussing', 'Balanstraße', '23', '81669', 'München', 'de')">
+            <div class="card-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="saved-bill-badge">Standard</div>
+            <div class="saved-bill-name">Simon Gussing</div>
+            <div class="saved-bill-addr">Balanstraße 23<br>81669 München<br>Deutschland</div>
+          </div>
+
+          <div class="saved-bill-card" onclick="selectBillingAddr(this, 'Herr', 'Simon', 'Gussing', 'Leopoldstraße', '100', '80802', 'München', 'de')">
+            <div class="card-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="saved-bill-name">Simon Gussing</div>
+            <div class="saved-bill-addr">Leopoldstraße 100<br>80802 München<br>Deutschland</div>
+          </div>
+
+          <div class="saved-bill-card new-card" onclick="selectNewBilling(this)">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            Neue Adresse
+          </div>
+
+        </div>
+
+        <div class="addr-form-divider" id="addr-form-divider" style="display:none;">Adressdetails</div>
+
+        <div id="addr-form-wrap" style="display:none;">
+        <div class="form-hint">* Pflichtfeld</div>
+
+        <!-- Anrede + Titel -->
+        <div class="form-row">
+          <div class="form-grid">
+            <div class="form-field">
+              <div class="field-wrap">
+                <label class="field-label floating">Anrede*</label>
+                <select class="field-select">
+                  <option value="herr">Herr</option>
+                  <option value="frau">Frau</option>
+                  <option value="divers">Divers</option>
+                </select>
+                <span class="select-arrow">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </div>
+            </div>
+            <div class="form-field">
+              <div class="field-wrap">
+                <label class="field-label floating">Titel (optional)</label>
+                <select class="field-select">
+                  <option value=""></option>
+                  <option value="dr">Dr.</option>
+                  <option value="prof">Prof.</option>
+                  <option value="prof-dr">Prof. Dr.</option>
+                </select>
+                <span class="select-arrow">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vorname + Nachname -->
+        <div class="form-row">
+          <div class="form-grid">
+            <div class="form-field">
+              <div class="field-wrap valid">
+                <label class="field-label floating">Vorname*</label>
+                <input class="field-input" type="text" value="Simon" maxlength="35">
+                <span class="field-check">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </div>
+              <div class="field-counter">5 / 35</div>
+            </div>
+            <div class="form-field">
+              <div class="field-wrap valid">
+                <label class="field-label floating">Nachname*</label>
+                <input class="field-input" type="text" value="Gussing" maxlength="35">
+                <span class="field-check">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </div>
+              <div class="field-counter">7 / 35</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Straße + Hausnummer -->
+        <div class="form-row">
+          <div class="form-grid cols-3">
+            <div class="form-field">
+              <div class="field-wrap valid">
+                <label class="field-label floating">Straße*</label>
+                <input class="field-input" type="text" value="Balanstraße" maxlength="35">
+                <span class="field-check">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </div>
+              <div class="field-counter">11 / 35</div>
+            </div>
+            <div class="form-field">
+              <div class="field-wrap valid">
+                <label class="field-label floating">Hausnummer*</label>
+                <input class="field-input" type="text" value="23" maxlength="15">
+                <span class="field-check">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </div>
+              <div class="field-counter">2 / 15</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PLZ + Ort -->
+        <div class="form-row">
+          <div class="form-grid cols-zip">
+            <div class="form-field">
+              <div class="field-wrap valid">
+                <label class="field-label floating">Postleitzahl*</label>
+                <input class="field-input" type="text" value="81669" maxlength="10">
+                <span class="field-check">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </div>
+            </div>
+            <div class="form-field">
+              <div class="field-wrap valid">
+                <label class="field-label floating">Ort*</label>
+                <input class="field-input" type="text" value="München" maxlength="35">
+                <span class="field-check">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </div>
+              <div class="field-counter">7 / 35</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Land -->
+        <div class="form-row">
+          <div class="form-field" style="max-width: 320px;">
+            <div class="field-wrap">
+              <label class="field-label floating">Land*</label>
+              <select class="field-select">
+                <option value="de" selected>Deutschland</option>
+                <option value="at">Österreich</option>
+                <option value="ch">Schweiz</option>
+              </select>
+              <span class="select-arrow">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Geburtsdatum + Telefon -->
+        <div class="form-row">
+          <div class="form-grid">
+            <div class="form-field">
+              <div class="field-wrap">
+                <label class="field-label floating">Geburtsdatum (optional)</label>
+                <input class="field-input" type="text" placeholder="TT.MM.JJJJ">
+              </div>
+            </div>
+            <div class="form-field">
+              <div class="field-wrap">
+                <label class="field-label floating">Telefon (optional)</label>
+                <input class="field-input" type="tel">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        </div><!-- end addr-form-wrap -->
+
+        <!-- Internal order reference -->
+        <div class="ref-section" id="ref-section">
+          <div class="ref-toggle" style="cursor:default;">
+            Interne Bestellreferenz (optional)
+          </div>
+          <div class="ref-body">
+            <div class="form-row">
+              <div class="form-grid">
+                <div class="form-field">
+                  <div class="field-wrap">
+                    <label class="field-label">Interne Referenznummer</label>
+                    <input class="field-input" type="text">
+                  </div>
+                </div>
+                <div class="form-field">
+                  <div class="field-wrap">
+                    <label class="field-label">Kostenstelle</label>
+                    <input class="field-input" type="text">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-field" style="max-width: 320px;">
+                <div class="field-wrap">
+                  <label class="field-label">Bestellnummer (PO)</label>
+                  <input class="field-input" type="text">
+                </div>
+              </div>
+            </div>
+            <p class="ref-hint">Diese Angaben erscheinen auf Ihrer Rechnung.</p>
+          </div>
+        </div>
+
+        <div style="overflow: hidden; margin-top: 20px;">
+          <button class="btn-next" onclick="location.href='checkout-step2.html'">
+            Weiter
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Lieferung -->
+    <div class="step-card">
+      <div class="step-header">
+        <span class="step-num">2</span>
+        Lieferung
+      </div>
+    </div>
+
+    <!-- Step 3: Zahlung -->
+    <div class="step-card">
+      <div class="step-header">
+        <span class="step-num">3</span>
+        Zahlung
+      </div>
+    </div>
+
+    <!-- Step 4: Bestellübersicht -->
+    <div class="step-card">
+      <div class="step-header">
+        <span class="step-num">4</span>
+        Bestellübersicht
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right: Order summary -->
+  <div class="order-summary">
+    <div class="summary-title">Ihre Bestellung</div>
+    <div class="summary-count">3 Artikel</div>
+
+    <div class="summary-row">
+      <span>Bruttopreis</span>
+      <span>702,46 €</span>
+    </div>
+    <div class="summary-row">
+      <span>Versand</span>
+      <span class="summary-free">Kostenfrei</span>
+    </div>
+
+    <hr class="summary-divider">
+
+    <div class="summary-row total">
+      <span>Gesamtpreis</span>
+      <span>702,46 €</span>
+    </div>
+    <div class="summary-vat">inkl. MwSt.</div>
+
+    <div class="summary-legal">
+      Mit Ihrer Bestellung erklären Sie sich mit unseren <a href="#">AGB</a> und unserer <a href="#">Datenschutzerklärung</a> einverstanden.<br><br>
+      Aufgrund Ihrer Bestellung erhalten Sie Direktwerbung per E-Mail für ähnliche Produkte. Falls Sie keine weitere Werbung wünschen, teilen Sie uns dies bitte per E-Mail an folgende Adresse mit: <a href="#">kundenservice@conrad.de</a>. Für die Übermittlung Ihres Widerspruchs werden Ihnen keine über den Basistarif hinausgehende Kosten entstehen.
+    </div>
+  </div>
+</div>
+
+<script>
+  // Floating labels
+  function refreshLabels() {
+    document.querySelectorAll('.field-input, .field-select').forEach(el => {
+      const label = el.closest('.field-wrap')?.querySelector('.field-label');
+      if (!label) return;
+      const update = () => label.classList.toggle('floating', !!el.value);
+      el.removeEventListener('input', update);
+      el.removeEventListener('change', update);
+      el.addEventListener('input', update);
+      el.addEventListener('change', update);
+      update();
+    });
+  }
+  refreshLabels();
+
+  // Fill form fields from a saved billing address card
+  function setField(selector, value) {
+    const el = document.querySelector(selector);
+    if (!el) return;
+    el.value = value;
+    el.dispatchEvent(new Event('input'));
+    el.dispatchEvent(new Event('change'));
+  }
+
+  function selectBillingAddr(card, anrede, vorname, nachname, strasse, hausnr, plz, ort, land) {
+    document.querySelectorAll('.saved-bill-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    // Hide form — address is already known from saved card
+    document.getElementById('addr-form-wrap').style.display = 'none';
+    document.getElementById('addr-form-divider').style.display = 'none';
+    setField('select.field-select', anrede === 'Herr' ? 'herr' : anrede === 'Frau' ? 'frau' : 'divers');
+    // Vorname / Nachname are inputs — find by order
+    const inputs = document.querySelectorAll('#addr-form-wrap .field-input');
+    if (inputs[0]) { inputs[0].value = vorname; inputs[0].dispatchEvent(new Event('input')); }
+    if (inputs[1]) { inputs[1].value = nachname; inputs[1].dispatchEvent(new Event('input')); }
+    if (inputs[2]) { inputs[2].value = strasse; inputs[2].dispatchEvent(new Event('input')); }
+    if (inputs[3]) { inputs[3].value = hausnr; inputs[3].dispatchEvent(new Event('input')); }
+    if (inputs[4]) { inputs[4].value = plz; inputs[4].dispatchEvent(new Event('input')); }
+    if (inputs[5]) { inputs[5].value = ort; inputs[5].dispatchEvent(new Event('input')); }
+    // Country select
+    const selects = document.querySelectorAll('#addr-form-wrap select');
+    if (selects[1]) { selects[1].value = land; selects[1].dispatchEvent(new Event('change')); }
+  }
+
+  function selectNewBilling(card) {
+    document.querySelectorAll('.saved-bill-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    document.getElementById('addr-form-wrap').style.display = 'block';
+    document.getElementById('addr-form-divider').style.display = 'flex';
+    // Clear all inputs
+    document.querySelectorAll('#addr-form-wrap .field-input').forEach(el => {
+      el.value = '';
+      el.dispatchEvent(new Event('input'));
+    });
+    document.querySelectorAll('#addr-form-wrap select').forEach(el => {
+      el.selectedIndex = 0;
+      el.dispatchEvent(new Event('change'));
+    });
+  }
+
+  function toggleRef() {
+    document.getElementById('ref-section').classList.toggle('open');
+  }
+</script>

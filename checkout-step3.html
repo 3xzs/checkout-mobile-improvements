@@ -1,0 +1,743 @@
+<title>Conrad – Bestellübersicht</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="mobile-frame.css">
+<link rel="stylesheet" href="mobile-fixes.css">
+
+<style>
+  :root {
+    --c-blue: #376EEF;
+    --c-blue-hover: #2856c9;
+    --c-navy: #001F42;
+    --c-page-bg: #F4F5F7;
+    --c-text: #272C35;
+    --c-text-on-dark: #FEFEFF;
+    --c-text-secondary: #5a6171;
+    --c-text-tertiary: #666c7a;
+    --c-border: #cfd4dd;
+    --c-border-control: #b6bcc7;
+    --c-bg-white: #ffffff;
+    --c-bg-tint: #f8f9fb;
+    --c-success: #218972;
+    --c-blue-tint-soft: #F4F5FE;
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius-pill: 999px;
+    --bg: var(--c-page-bg);
+    --surface: var(--c-bg-white);
+    --fg: var(--c-text);
+    --fg-muted: var(--c-text-secondary);
+    --border: var(--c-border);
+    --accent: var(--c-blue);
+    --accent-hover: var(--c-blue-hover);
+    --green: var(--c-success);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.5;
+  }
+
+  .topbar { background: var(--c-blue); color: var(--c-text-on-dark); font-size: 12px; padding: 6px max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .topbar-inner { max-width: 1680px; margin: 0 auto; display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; }
+  .topbar-item { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+
+  .header { background: var(--c-navy); color: var(--c-text-on-dark); padding: 16px 0; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; }
+  .header-inner { max-width: 1680px; margin: 0 auto; padding: 0 max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); display: flex; align-items: center; justify-content: space-between; }
+  .logo svg { width: 130px; height: auto; display: block; }
+  .secure-badge { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--c-text-on-dark); opacity: 0.85; }
+  .secure-badge svg { width: 18px; height: 18px; }
+
+  .main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 28px max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  @media (max-width: 768px) { .main { grid-template-columns: 1fr; } }
+
+  /* ── Step cards ── */
+  .step-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+
+  .step-header {
+    display: flex;
+    align-items: flex-start;
+    padding: 16px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: var(--radius-pill);
+    border: 2px solid var(--fg);
+    font-size: 12px;
+    font-weight: 700;
+    margin-right: 10px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* inactive steps */
+  .step-card.inactive .step-header { color: var(--fg-muted); }
+  .step-card.inactive .step-num { border-color: var(--c-border-control); color: var(--fg-muted); }
+
+  /* active step */
+  .step-card.active .step-header {
+    background: var(--c-blue);
+    color: var(--c-text-on-dark);
+    align-items: center;
+  }
+  .step-card.active .step-num { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.5); color: var(--c-text-on-dark); margin-top: 0; }
+
+  .step-summary { flex: 1; }
+  .step-summary-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .step-summary-detail { font-size: 13px; color: var(--fg-muted); line-height: 1.6; }
+
+  .step-edit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    color: var(--accent);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 500;
+    padding: 0;
+    white-space: nowrap;
+    margin-left: 16px;
+    flex-shrink: 0;
+  }
+  .step-edit-btn:hover { text-decoration: underline; }
+
+  .step-body {
+    padding: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── Payment options ── */
+  .payment-option {
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+
+  .payment-option.selected {
+    border-color: var(--accent);
+    background: var(--c-blue-tint-soft);
+  }
+
+  .radio-circle {
+    width: 18px;
+    height: 18px;
+    border-radius: var(--radius-pill);
+    border: 2px solid var(--c-border-control);
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .payment-option.selected .radio-circle { border-color: var(--accent); background: var(--accent); }
+
+  .radio-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: var(--radius-pill);
+    background: white;
+    display: none;
+  }
+
+  .payment-option.selected .radio-dot { display: block; }
+
+  .payment-label {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--fg);
+  }
+
+  .payment-desc {
+    font-size: 13px;
+    color: var(--fg-muted);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .payment-logo {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* PayPal logo */
+  .paypal-logo {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  .paypal-logo .pp-pay { color: #003087; }
+  .paypal-logo .pp-pal { color: #009cde; }
+
+  /* Card icons */
+  .card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 24px;
+    border-radius: 3px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+  }
+
+  .card-icon.mc { background: #eb001b; color: white; position: relative; overflow: visible; }
+  .card-icon.visa { background: #1a1f71; color: white; font-size: 10px; }
+  .card-icon.amex { background: #2e77bc; color: white; }
+
+  /* Mastercard overlapping circles SVG approach */
+  .mc-wrap { position: relative; display: inline-flex; align-items: center; width: 36px; height: 24px; }
+
+  /* Payment text badge */
+  .payment-text-badge {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fg);
+    white-space: nowrap;
+  }
+
+  /* ── Next button ── */
+  .btn-next {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-xs);
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: 20px;
+    float: right;
+  }
+  .btn-next:hover { background: var(--accent-hover); }
+
+  /* ── Order summary ── */
+  .order-summary { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px; }
+  .summary-title { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
+  .summary-count { font-size: 13px; color: var(--fg-muted); margin-bottom: 16px; }
+  .summary-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; font-size: 14px; font-variant-numeric: tabular-nums; }
+  .summary-divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+  .summary-row.total { font-size: 17px; font-weight: 700; }
+  .summary-vat { font-size: 12px; color: var(--fg-muted); margin-top: 2px; }
+  .summary-free { color: var(--green); font-weight: 600; }
+  .summary-legal { font-size: 11px; color: var(--fg-muted); margin-top: 16px; line-height: 1.6; }
+  .summary-legal a { color: var(--accent); text-decoration: none; }
+  .summary-legal a:hover { text-decoration: underline; }
+
+  /* ── Invoice copy section ── */
+  .invoice-copy-section {
+    border: 1.5px solid var(--accent);
+    border-radius: var(--radius-sm);
+    background: var(--c-blue-tint-soft);
+    overflow: hidden;
+    margin-top: 16px;
+  }
+  .invoice-copy-header {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .invoice-copy-body { padding: 0 16px 16px; }
+  .invoice-copy-body p {
+    font-size: 12px;
+    color: var(--fg-muted);
+    margin: 0 0 12px;
+  }
+
+  /* Email chip input */
+  .email-chips-wrap {
+    min-height: 44px;
+    border: 1px solid var(--c-border-control);
+    border-radius: var(--radius-xs);
+    background: var(--surface);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 10px;
+    cursor: text;
+    margin-bottom: 10px;
+  }
+  .email-chips-wrap:focus-within { border-color: var(--accent); }
+  .email-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--accent);
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 3px 8px 3px 10px;
+    border-radius: var(--radius-pill);
+  }
+  .chip-remove {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    opacity: .8;
+  }
+  .chip-remove:hover { opacity: 1; }
+  .chip-input {
+    border: none;
+    outline: none;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--fg);
+    background: transparent;
+    min-width: 180px;
+    flex: 1;
+  }
+  .chip-label {
+    font-size: 11px;
+    color: var(--fg-muted);
+    margin-bottom: 5px;
+  }
+  .message-field {
+    width: 100%;
+    border: 1px solid var(--c-border-control);
+    border-radius: var(--radius-xs);
+    background: var(--surface);
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--fg);
+    padding: 10px;
+    resize: vertical;
+    min-height: 72px;
+  }
+  .message-field:focus { outline: none; border-color: var(--accent); }
+
+  /* ── Approval section ── */
+  .approval-toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 16px;
+    padding: 13px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    background: var(--surface);
+    transition: border-color .15s, background .15s;
+    user-select: none;
+  }
+  .approval-toggle-row:hover { border-color: #d97706; }
+  .approval-toggle-row.checked { border-color: #d97706; background: #fffbeb; }
+  .approval-checkbox {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 2px solid var(--c-border-control);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+  }
+  .approval-toggle-row.checked .approval-checkbox { background: #d97706; border-color: #d97706; }
+  .approval-toggle-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--fg);
+    flex: 1;
+  }
+  .approval-section {
+    border: 1.5px solid #d97706;
+    border-radius: var(--radius-sm);
+    background: #fffbeb;
+    overflow: hidden;
+    margin-top: 8px;
+    display: none;
+  }
+  .approval-section.open { display: block; }
+  .approval-section-header {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #92400e;
+  }
+  .approval-section-body { padding: 0 16px 16px; }
+  .approval-section-body p {
+    font-size: 12px;
+    color: #78350f;
+    margin: 0 0 12px;
+  }
+  .approval-input {
+    width: 100%;
+    border: 1px solid #fcd34d;
+    border-radius: var(--radius-xs);
+    background: white;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--fg);
+    padding: 10px 12px;
+  }
+  .approval-input:focus { outline: none; border-color: #d97706; }
+</style>
+
+<script>
+  function selectPayment(el, showInvoiceCopy) {
+    document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    const section = document.getElementById('invoice-copy');
+    if (section) section.style.display = showInvoiceCopy ? 'block' : 'none';
+    const approvalWrap = document.getElementById('approval-wrap');
+    if (approvalWrap) approvalWrap.style.display = showInvoiceCopy ? 'block' : 'none';
+    if (!showInvoiceCopy) setApproval(false);
+  }
+
+  function toggleApproval() {
+    const row = document.getElementById('approval-row');
+    const isChecked = row.classList.toggle('checked');
+    setApproval(isChecked);
+  }
+
+  function setApproval(on) {
+    const row = document.getElementById('approval-row');
+    const section = document.getElementById('approval-section');
+    const icon = document.getElementById('approval-check-icon');
+    if (on) {
+      row.classList.add('checked');
+      section.classList.add('open');
+      if (icon) icon.style.display = 'block';
+    } else {
+      row.classList.remove('checked');
+      section.classList.remove('open');
+      if (icon) icon.style.display = 'none';
+    }
+    try { sessionStorage.setItem('approvalRequested', on ? '1' : '0'); } catch(e) {}
+  }
+
+  // Chip input — press Enter or comma to add chip
+  document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('chip-input');
+    if (!input) return;
+    input.addEventListener('keydown', e => {
+      if ((e.key === 'Enter' || e.key === ',') && input.value.trim()) {
+        e.preventDefault();
+        const email = input.value.trim().replace(/,$/, '');
+        if (email) {
+          const chip = document.createElement('div');
+          chip.className = 'email-chip';
+          chip.innerHTML = email + ' <button class="chip-remove" type="button" onclick="removeChip(this)">×</button>';
+          input.before(chip);
+          input.value = '';
+        }
+      }
+    });
+  });
+
+  function removeChip(btn) {
+    btn.closest('.email-chip').remove();
+  }
+</script>
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-item">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5L5 9.5L11 3.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Plattform für alles Technische
+    </div>
+    <div class="topbar-item">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5L5 9.5L11 3.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Lieferungen in 24h
+    </div>
+    <div class="topbar-item">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5L5 9.5L11 3.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Große Auswahl, eine Rechnung
+    </div>
+    <div class="topbar-item">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5L5 9.5L11 3.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Garantiertes Rückgaberecht
+    </div>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-inner">
+    <a href="index.html" class="logo" aria-label="Conrad">
+      <svg width="160" height="40" viewBox="0 0 160 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_s3)">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M37.7528 0L36.1809 6.88901H26.1698C16.9036 6.88901 11.8011 12.8209 11.8011 23.592C11.8011 30.5305 14.7584 33.1104 22.7123 33.1104H30.26L28.7167 40H15.5869C3.94266 40 0 36.3155 0 25.4795C0 16.6882 2.78962 8.76173 7.33826 4.55168C10.7957 1.36311 15.7071 0 23.7738 0H37.7528ZM39.3954 9.77778C46.1119 9.77778 48.5393 11.7969 48.5393 17.3328C48.5393 25.5503 43.8927 30.2212 35.7373 30.2212L23.4066 30.2222C16.6906 30.2222 14.382 28.463 14.382 23.3874C14.382 14.5638 18.7593 9.77778 26.7948 9.77778H39.3954ZM62.4173 9.77778L68.2557 21.5714L71.087 9.77778H79.1011L74.2156 30.2222H65.8731L58.8715 16.67L55.654 30.2222H47.6404L52.4967 9.77778H62.4173ZM96.6532 9.77778C103.594 9.77778 106.358 11.565 106.358 16.0066C106.358 20.1002 103.714 22.7535 98.696 23.7633L101.955 27.6459L110.708 16.093C115.223 10.109 115.616 9.79206 122.183 9.77834L133.034 9.77778L128.107 30.2222H119.633L120.504 26.5608H111.581L108.935 30.2222H100.47C95.7216 30.2222 95.5112 30.1077 93.1378 26.329L89.081 19.7836H95.0009C97.3438 19.7836 98.4857 18.8619 98.4857 17.0158C98.4857 15.7181 97.2241 15.026 94.8195 15.026H89.4427L85.7759 30.2222H77.3034L82.2305 9.77778H96.6532ZM151.633 9.77778C157.499 9.77778 160 11.9983 160 17.2465C160 25.7239 155.772 30.2222 147.82 30.2222H130.337L135.193 9.77778H151.633ZM29.7026 15.1981C25.3553 15.1981 22.8566 17.6208 22.8566 22.0329C22.8566 24.541 24.0369 25.2914 27.7833 25.2914L33.2493 25.292C37.3567 25.292 39.5759 22.8396 39.5759 18.2556C39.5759 15.8329 38.6768 15.1986 35.2291 15.1986L29.7026 15.1981ZM147.104 15.026H142.341L139.957 24.9751H145.676C149.19 24.9751 151.393 22.3796 151.393 18.2557C151.393 15.7181 150.47 15.026 147.104 15.026ZM123.019 15.026H122.449C119.834 15.026 119.293 15.3431 117.49 17.9678L114.967 21.5714H121.457L123.019 15.026Z" fill="#FEFEFF"></path>
+</g>
+<defs><clipPath id="clip0_s3"><rect width="160" height="40" fill="white"></rect></clipPath></defs>
+</svg>
+    </a>
+    <div class="secure-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Sicher einkaufen
+    </div>
+  </div>
+</header>
+
+<!-- Main -->
+<div class="main">
+  <div>
+
+    <!-- Step 1: Completed -->
+    <div class="step-card">
+      <div class="step-header">
+        <span class="step-num">1</span>
+        <div class="step-summary">
+          <div class="step-summary-title">Rechnungsadresse</div>
+          <div class="step-summary-detail">
+            Simon Gussing<br>
+            Balanstraße 23<br>
+            81669 München<br>
+            Deutschland
+          </div>
+          <div class="step-summary-detail" style="margin-top: 8px;">Rechnung per E-Mail</div>
+        </div>
+        <button class="step-edit-btn" onclick="location.href='checkout-step1.html'">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Ändern
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 2: Completed -->
+    <div class="step-card">
+      <div class="step-header">
+        <span class="step-num">2</span>
+        <div class="step-summary">
+          <div class="step-summary-title">Lieferung</div>
+          <div class="step-summary-detail">
+            Lieferadresse ist gleich Rechnungsadresse
+          </div>
+          <div class="step-summary-detail" style="margin-top: 4px;">Standardversand</div>
+        </div>
+        <button class="step-edit-btn" onclick="location.href='checkout-step2.html'">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Ändern
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 3: Zahlung (active) -->
+    <div class="step-card active">
+      <div class="step-header">
+        <span class="step-num">3</span>
+        Zahlung
+      </div>
+      <div class="step-body">
+
+        <!-- PayPal -->
+        <div class="payment-option" onclick="selectPayment(this, false)">
+          <div class="radio-circle"><div class="radio-dot"></div></div>
+          <div class="payment-label">PayPal</div>
+          <div class="payment-logo">
+            <!-- PayPal wordmark -->
+            <svg width="60" height="16" viewBox="0 0 80 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <text x="0" y="15" font-family="Arial, sans-serif" font-size="14" font-weight="800" fill="#003087">Pay</text>
+              <text x="26" y="15" font-family="Arial, sans-serif" font-size="14" font-weight="800" fill="#009cde">Pal</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Rechnung (selected) -->
+        <div class="payment-option selected" onclick="selectPayment(this, true)">
+          <div class="radio-circle"><div class="radio-dot"></div></div>
+          <div class="payment-label">
+            Rechnung
+            <div class="payment-desc">Sie können den Rechnungskauf bis zu 16 Tagen nach Rechnungsstellung begleichen.</div>
+          </div>
+          <div class="payment-logo">
+            <span class="payment-text-badge">Rechnung</span>
+          </div>
+        </div>
+
+        <!-- Bankeinzug -->
+        <div class="payment-option" onclick="selectPayment(this, false)">
+          <div class="radio-circle"><div class="radio-dot"></div></div>
+          <div class="payment-label">Bankeinzug</div>
+          <div class="payment-logo">
+            <span class="payment-text-badge">Bankeinzug</span>
+          </div>
+        </div>
+
+        <!-- Kreditkarte -->
+        <div class="payment-option" onclick="selectPayment(this, false)">
+          <div class="radio-circle"><div class="radio-dot"></div></div>
+          <div class="payment-label">Kreditkarte</div>
+          <div class="payment-logo">
+            <!-- Mastercard -->
+            <svg width="36" height="24" viewBox="0 0 36 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="36" height="24" rx="3" fill="#f0f0f0"/>
+              <circle cx="14" cy="12" r="7" fill="#EB001B"/>
+              <circle cx="22" cy="12" r="7" fill="#F79E1B"/>
+              <path d="M18 6.8a7 7 0 0 1 0 10.4A7 7 0 0 1 18 6.8z" fill="#FF5F00"/>
+            </svg>
+            <!-- Visa -->
+            <svg width="36" height="24" viewBox="0 0 36 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="36" height="24" rx="3" fill="#1A1F71"/>
+              <text x="18" y="16" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="800" fill="white" letter-spacing="0.5">VISA</text>
+            </svg>
+            <!-- Amex -->
+            <svg width="36" height="24" viewBox="0 0 36 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="36" height="24" rx="3" fill="#2E77BC"/>
+              <text x="18" y="16" text-anchor="middle" font-family="Arial, sans-serif" font-size="7" font-weight="700" fill="white" letter-spacing="0.3">AMEX</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Vorauskasse -->
+        <div class="payment-option" onclick="selectPayment(this, false)">
+          <div class="radio-circle"><div class="radio-dot"></div></div>
+          <div class="payment-label">Vorauskasse</div>
+          <div class="payment-logo">
+            <span class="payment-text-badge">Vorauskasse</span>
+          </div>
+        </div>
+
+        <!-- Invoice copy section — shown when Rechnung is selected -->
+        <div class="invoice-copy-section" id="invoice-copy">
+          <div class="invoice-copy-header">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 2h11v11H2zM5 5h5M5 7.5h5M5 10h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Rechnungskopie an weitere Empfänger senden
+          </div>
+          <div class="invoice-copy-body">
+            <p>Optional: Die Rechnung wird zusätzlich an folgende E-Mail-Adressen weitergeleitet.</p>
+            <div class="chip-label">Empfänger-E-Mail(s)</div>
+            <div class="email-chips-wrap" id="chips-wrap" onclick="document.getElementById('chip-input').focus()">
+              <div class="email-chip">buchhaltung@firma.de <button class="chip-remove" onclick="removeChip(this)" type="button">×</button></div>
+              <input class="chip-input" id="chip-input" type="email" placeholder="E-Mail eingeben, Enter drücken">
+            </div>
+            <div class="chip-label">Nachricht (optional)</div>
+            <textarea class="message-field" placeholder="z. B. Für Projekt X – bitte bis Monatsende verbuchen"></textarea>
+          </div>
+        </div>
+
+        <!-- Approval section — shown when Rechnung is selected -->
+        <div id="approval-wrap">
+          <div class="approval-toggle-row" id="approval-row" onclick="toggleApproval()">
+            <div class="approval-checkbox">
+              <svg width="11" height="9" viewBox="0 0 11 9" fill="none" style="display:none" id="approval-check-icon"><path d="M1 4.5L4 7.5L10 1.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="approval-toggle-label">
+              Zur Genehmigung einreichen
+              <div style="font-size:12px; font-weight:400; color: var(--fg-muted); margin-top:2px;">Diese Bestellung wird vor dem Kauf zur Freigabe weitergeleitet.</div>
+            </div>
+          </div>
+
+          <div class="approval-section" id="approval-section">
+            <div class="approval-section-header">
+              <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1.5a6 6 0 1 1 0 12 6 6 0 0 1 0-12zM7.5 5v3.5M7.5 10v.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              Genehmigung anfordern
+            </div>
+            <div class="approval-section-body">
+              <p>Die Bestellung wird zur Freigabe an folgende Person gesendet. Sie erhalten eine Benachrichtigung, sobald die Genehmigung erteilt wurde.</p>
+              <div class="chip-label">E-Mail des Genehmigenden</div>
+              <input class="approval-input" type="email" placeholder="z. B. m.schmidt@firma.de" value="m.schmidt@firma.de" style="margin-bottom:10px;">
+              <div class="chip-label">Nachricht (optional)</div>
+              <textarea class="message-field approval-input" placeholder="z. B. Für Projekt X – bitte bis Freitag genehmigen" style="border-color:#fcd34d;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div style="overflow: hidden;">
+          <button class="btn-next" onclick="location.href='checkout-step4.html'">
+            Bestellung prüfen
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Bestellübersicht -->
+    <div class="step-card inactive">
+      <div class="step-header">
+        <span class="step-num">4</span>
+        Bestellübersicht
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right: Order summary -->
+  <div class="order-summary">
+    <div class="summary-title">Ihre Bestellung</div>
+    <div class="summary-count">3 Artikel</div>
+
+    <div class="summary-row">
+      <span>Bruttopreis</span>
+      <span>702,46 €</span>
+    </div>
+    <div class="summary-row">
+      <span>Versand</span>
+      <span class="summary-free">Kostenfrei</span>
+    </div>
+
+    <hr class="summary-divider">
+
+    <div class="summary-row total">
+      <span>Gesamtpreis</span>
+      <span>702,46 €</span>
+    </div>
+    <div class="summary-vat">inkl. MwSt.</div>
+
+    <div class="summary-legal">
+      Mit Ihrer Bestellung erklären Sie sich mit unseren <a href="#">AGB</a> und unserer <a href="#">Datenschutzerklärung</a> einverstanden.<br><br>
+      Aufgrund Ihrer Bestellung erhalten Sie Direktwerbung per E-Mail für ähnliche Produkte. Falls Sie keine weitere Werbung wünschen, teilen Sie uns dies bitte per E-Mail an folgende Adresse mit: <a href="#">kundenservice@conrad.de</a>. Für die Übermittlung Ihres Widerspruchs werden Ihnen keine über den Basistarif hinausgehende Kosten entstehen.
+    </div>
+  </div>
+</div>

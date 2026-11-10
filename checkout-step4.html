@@ -1,0 +1,800 @@
+<title>Conrad – Bestellübersicht</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="mobile-frame.css">
+<link rel="stylesheet" href="mobile-fixes.css">
+
+<style>
+  :root {
+    --c-blue: #376EEF;
+    --c-blue-hover: #2856c9;
+    --c-navy: #001F42;
+    --c-page-bg: #F4F5F7;
+    --c-text: #272C35;
+    --c-text-on-dark: #FEFEFF;
+    --c-text-secondary: #5a6171;
+    --c-text-tertiary: #666c7a;
+    --c-border: #cfd4dd;
+    --c-border-control: #b6bcc7;
+    --c-bg-white: #ffffff;
+    --c-bg-tint: #f8f9fb;
+    --c-success: #218972;
+    --c-success-bg: #E0F4EE;
+    --c-success-text: #0F3D2E;
+    --c-danger: #d9234c;
+    --c-blue-tint: #eaf0fe;
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius-pill: 999px;
+    --bg: var(--c-page-bg);
+    --surface: var(--c-bg-white);
+    --fg: var(--c-text);
+    --fg-muted: var(--c-text-secondary);
+    --fg-faint: var(--c-text-tertiary);
+    --border: var(--c-border);
+    --accent: var(--c-blue);
+    --accent-hover: var(--c-blue-hover);
+    --green: var(--c-success);
+    --green-bg: var(--c-success-bg);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.5;
+  }
+
+  .topbar { background: var(--c-blue); color: var(--c-text-on-dark); font-size: 12px; padding: 6px max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .topbar-inner { max-width: 1680px; margin: 0 auto; display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; }
+  .topbar-item { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+
+  .header { background: var(--c-navy); color: var(--c-text-on-dark); padding: 16px 0; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; }
+  .header-inner { max-width: 1680px; margin: 0 auto; padding: 0 max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); display: flex; align-items: center; justify-content: space-between; }
+  .logo svg { width: 130px; height: auto; display: block; }
+  .secure-badge { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--c-text-on-dark); opacity: 0.85; }
+  .secure-badge svg { width: 18px; height: 18px; }
+
+  .main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 28px max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  @media (max-width: 768px) { .main { grid-template-columns: 1fr; } }
+
+  /* ── Step cards ── */
+  .step-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+
+  .step-header {
+    display: flex;
+    align-items: flex-start;
+    padding: 16px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: var(--radius-pill);
+    border: 2px solid var(--fg);
+    font-size: 12px;
+    font-weight: 700;
+    margin-right: 10px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .step-summary { flex: 1; }
+  .step-summary-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .step-summary-detail { font-size: 13px; color: var(--fg-muted); line-height: 1.6; }
+
+  .step-edit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    color: var(--accent);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 500;
+    padding: 0;
+    white-space: nowrap;
+    margin-left: 16px;
+    flex-shrink: 0;
+  }
+  .step-edit-btn:hover { text-decoration: underline; }
+
+  /* Step 4 active */
+  .step-card.active .step-header {
+    background: var(--c-blue);
+    color: var(--c-text-on-dark);
+    align-items: center;
+    padding: 14px 20px;
+  }
+  .step-card.active .step-num {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.5);
+    color: var(--c-text-on-dark);
+    margin-top: 0;
+  }
+  .step-card.active .step-header-text { font-size: 14px; }
+
+  .step-body { padding: 0; border-top: 1px solid var(--border); }
+
+  /* ── Info banner ── */
+  .info-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 20px;
+    background: var(--c-blue-tint);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .info-banner-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--fg-muted);
+  }
+
+  .info-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: var(--radius-pill);
+    background: var(--accent);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .edit-cart-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--accent);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 0;
+  }
+  .edit-cart-btn:hover { text-decoration: underline; }
+
+  /* ── Order items ── */
+  .order-items { padding: 0 20px; }
+
+  .order-item {
+    display: grid;
+    grid-template-columns: 64px 1fr auto;
+    gap: 14px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .order-item:last-child { border-bottom: none; }
+
+  .item-img-wrap {
+    width: 64px;
+    height: 64px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xs);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--c-bg-tint);
+    flex-shrink: 0;
+  }
+
+  .item-img-wrap img { max-width: 90%; max-height: 90%; object-fit: contain; }
+
+  .item-info { min-width: 0; }
+
+  .item-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--fg);
+    line-height: 1.4;
+    margin-bottom: 3px;
+  }
+
+  .item-seller {
+    font-size: 12px;
+    color: var(--fg-muted);
+    margin-bottom: 3px;
+  }
+
+  .item-seller a { color: var(--accent); text-decoration: none; }
+  .item-seller a:hover { text-decoration: underline; }
+
+  .item-sku { font-size: 12px; color: var(--fg-faint); margin-bottom: 4px; }
+  .item-stock { font-size: 12px; color: var(--fg-muted); margin-bottom: 6px; }
+
+  .delivery-pill {
+    display: inline-block;
+    background: var(--green-bg);
+    color: var(--c-success-text);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: var(--radius-xs);
+  }
+
+  .item-side { text-align: right; white-space: nowrap; }
+
+  .item-qty { font-size: 13px; color: var(--fg-muted); margin-bottom: 2px; }
+  .item-unit-price { font-size: 12px; color: var(--fg-muted); margin-bottom: 4px; }
+
+  .item-price {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--fg);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .item-price-old {
+    font-size: 12px;
+    color: var(--fg-muted);
+    text-decoration: line-through;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 2px;
+  }
+
+  .item-sale-badge {
+    display: inline-block;
+    background: var(--c-danger);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 2px;
+    margin-bottom: 4px;
+  }
+
+  .item-extra { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+
+  .energy-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #2ecc40;
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+    width: 22px;
+    height: 22px;
+    border-radius: 2px;
+  }
+
+  .doc-link {
+    font-size: 12px;
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .doc-link:hover { text-decoration: underline; }
+
+  /* ── CTA button ── */
+  .cta-wrap {
+    padding: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn-order {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-xs);
+    padding: 13px 28px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .btn-order:hover { background: var(--accent-hover); }
+
+  /* ── Order summary ── */
+  .order-summary { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px; }
+  .summary-title { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
+  .summary-count { font-size: 13px; color: var(--fg-muted); margin-bottom: 16px; }
+  .summary-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; font-size: 14px; font-variant-numeric: tabular-nums; }
+  .summary-divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+  .summary-row.total { font-size: 17px; font-weight: 700; }
+  .summary-vat { font-size: 12px; color: var(--fg-muted); margin-top: 2px; margin-bottom: 20px; }
+  .summary-free { color: var(--green); font-weight: 600; }
+
+  .btn-order-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-xs);
+    padding: 13px 20px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    margin-bottom: 16px;
+  }
+  .btn-order-summary:hover { background: var(--accent-hover); }
+
+  .summary-legal { font-size: 11px; color: var(--fg-muted); line-height: 1.6; }
+  .summary-legal a { color: var(--accent); text-decoration: none; }
+  .summary-legal a:hover { text-decoration: underline; }
+
+  /* ── Footer ── */
+  .footer-trust {
+    background: var(--c-navy);
+    color: var(--c-text-on-dark);
+    padding: 16px 0;
+    margin-top: 40px;
+  }
+
+  .footer-trust-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 max(16px, env(safe-area-inset-left, 0px));
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    flex-wrap: wrap;
+  }
+
+  .footer-trust-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .footer-links {
+    padding: 16px 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+  }
+
+  .footer-links-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 max(16px, env(safe-area-inset-left, 0px));
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .footer-link-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--fg-muted);
+  }
+
+  .footer-badges {
+    padding: 20px 0 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .badge-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    font-weight: 700;
+    text-align: center;
+    color: white;
+  }
+
+  .footer-nav {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    padding: 12px 0 20px;
+    font-size: 12px;
+    color: var(--fg-muted);
+    border-top: 1px solid var(--border);
+  }
+
+  .footer-nav a { color: var(--fg-muted); text-decoration: none; }
+  .footer-nav a:hover { text-decoration: underline; }
+
+  /* Vorauskasse label shown at top of step 4 body (above step-4 panel) */
+  .prev-payment {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 20px;
+    font-size: 14px;
+    color: var(--fg-muted);
+    margin-bottom: 8px;
+  }
+</style>
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-item">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5L5 9.5L11 3.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Plattform für alles Technische
+    </div>
+    <div class="topbar-item">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5L5 9.5L11 3.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Lieferungen in 24h
+    </div>
+    <div class="topbar-item">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5L5 9.5L11 3.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Große Auswahl, eine Rechnung
+    </div>
+    <div class="topbar-item">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5L5 9.5L11 3.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Garantiertes Rückgaberecht
+    </div>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-inner">
+    <a href="index.html" class="logo" aria-label="Conrad">
+      <svg width="160" height="40" viewBox="0 0 160 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_s4)">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M37.7528 0L36.1809 6.88901H26.1698C16.9036 6.88901 11.8011 12.8209 11.8011 23.592C11.8011 30.5305 14.7584 33.1104 22.7123 33.1104H30.26L28.7167 40H15.5869C3.94266 40 0 36.3155 0 25.4795C0 16.6882 2.78962 8.76173 7.33826 4.55168C10.7957 1.36311 15.7071 0 23.7738 0H37.7528ZM39.3954 9.77778C46.1119 9.77778 48.5393 11.7969 48.5393 17.3328C48.5393 25.5503 43.8927 30.2212 35.7373 30.2212L23.4066 30.2222C16.6906 30.2222 14.382 28.463 14.382 23.3874C14.382 14.5638 18.7593 9.77778 26.7948 9.77778H39.3954ZM62.4173 9.77778L68.2557 21.5714L71.087 9.77778H79.1011L74.2156 30.2222H65.8731L58.8715 16.67L55.654 30.2222H47.6404L52.4967 9.77778H62.4173ZM96.6532 9.77778C103.594 9.77778 106.358 11.565 106.358 16.0066C106.358 20.1002 103.714 22.7535 98.696 23.7633L101.955 27.6459L110.708 16.093C115.223 10.109 115.616 9.79206 122.183 9.77834L133.034 9.77778L128.107 30.2222H119.633L120.504 26.5608H111.581L108.935 30.2222H100.47C95.7216 30.2222 95.5112 30.1077 93.1378 26.329L89.081 19.7836H95.0009C97.3438 19.7836 98.4857 18.8619 98.4857 17.0158C98.4857 15.7181 97.2241 15.026 94.8195 15.026H89.4427L85.7759 30.2222H77.3034L82.2305 9.77778H96.6532ZM151.633 9.77778C157.499 9.77778 160 11.9983 160 17.2465C160 25.7239 155.772 30.2222 147.82 30.2222H130.337L135.193 9.77778H151.633ZM29.7026 15.1981C25.3553 15.1981 22.8566 17.6208 22.8566 22.0329C22.8566 24.541 24.0369 25.2914 27.7833 25.2914L33.2493 25.292C37.3567 25.292 39.5759 22.8396 39.5759 18.2556C39.5759 15.8329 38.6768 15.1986 35.2291 15.1986L29.7026 15.1981ZM147.104 15.026H142.341L139.957 24.9751H145.676C149.19 24.9751 151.393 22.3796 151.393 18.2557C151.393 15.7181 150.47 15.026 147.104 15.026ZM123.019 15.026H122.449C119.834 15.026 119.293 15.3431 117.49 17.9678L114.967 21.5714H121.457L123.019 15.026Z" fill="#FEFEFF"></path>
+</g>
+<defs><clipPath id="clip0_s4"><rect width="160" height="40" fill="white"></rect></clipPath></defs>
+</svg>
+    </a>
+    <div class="secure-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Sicher einkaufen
+    </div>
+  </div>
+</header>
+
+<!-- Main -->
+<div class="main">
+  <div>
+
+    <!-- Step 1: Completed -->
+    <div class="step-card">
+      <div class="step-header">
+        <span class="step-num">1</span>
+        <div class="step-summary">
+          <div class="step-summary-title">Rechnungsadresse</div>
+          <div class="step-summary-detail">
+            Simon Gussing<br>
+            Balanstraße 23<br>
+            81669 München<br>
+            Deutschland
+          </div>
+          <div class="step-summary-detail" style="margin-top: 6px;">Kostenstelle: IT-Infrastruktur · Ref: 2024-Q4-089</div>
+        </div>
+        <button class="step-edit-btn" onclick="location.href='checkout-step1.html'">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Ändern
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 2: Completed -->
+    <div class="step-card">
+      <div class="step-header">
+        <span class="step-num">2</span>
+        <div class="step-summary">
+          <div class="step-summary-title">Lieferung</div>
+          <div class="step-summary-detail">Leopoldstraße 100, 80802 München</div>
+          <div class="step-summary-detail" style="margin-top: 2px;">Warenempfänger: Thomas Müller</div>
+          <div class="step-summary-detail" style="margin-top: 4px;">Standardversand</div>
+        </div>
+        <button class="step-edit-btn" onclick="location.href='checkout-step2.html'">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Ändern
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 3: Completed -->
+    <div class="step-card">
+      <div class="step-header">
+        <span class="step-num">3</span>
+        <div class="step-summary">
+          <div class="step-summary-title">Zahlung</div>
+          <div class="step-summary-detail">Vorauskasse</div>
+        </div>
+        <button class="step-edit-btn" onclick="location.href='checkout-step3.html'">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Ändern
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 4: Bestellübersicht (active) -->
+    <div class="step-card active">
+      <div class="step-header">
+        <span class="step-num">4</span>
+        <span class="step-header-text">Fast geschafft! Prüfen Sie nur noch Ihre Daten, um ihre Bestellung abzuschicken</span>
+      </div>
+      <div class="step-body">
+
+        <!-- Info banner -->
+        <div class="info-banner">
+          <div class="info-banner-left">
+            <span class="info-icon">i</span>
+            <span>Vorteilscodes und Geschenkkarten können Sie direkt im Einkaufswagen hinzufügen.</span>
+          </div>
+          <button class="edit-cart-btn">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M8.5 1.5l3 3L4 12H1v-3L8.5 1.5z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Einkaufswagen bearbeiten
+          </button>
+        </div>
+
+        <!-- Order items -->
+        <div class="order-items">
+
+          <!-- Item 1: Asus Monitor -->
+          <div class="order-item">
+            <div class="item-img-wrap">
+              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="64" height="64">
+                <rect width="64" height="64" fill="#f4f5f7"/>
+                <rect x="10" y="14" width="44" height="28" rx="2" fill="#222" stroke="#444" stroke-width="1"/>
+                <rect x="12" y="16" width="40" height="24" fill="#1a6bbf"/>
+                <rect x="26" y="42" width="12" height="4" fill="#555"/>
+                <rect x="20" y="46" width="24" height="2" rx="1" fill="#444"/>
+                <text x="32" y="31" text-anchor="middle" font-size="6" fill="white" font-family="Arial">ASUS</text>
+              </svg>
+            </div>
+            <div class="item-info">
+              <div class="item-name">Asus MB14AC LED-Monitor EEK B (A - G) 35.6 cm (14 Zoll) 1920 × 1080 Pixel 16:9 5 ms USB-C® IPS LED</div>
+              <div class="item-seller">Verkauf und Versand durch <a href="#">Conrad Electronic</a></div>
+              <div class="item-sku">Bestell-Nr.: 2383516</div>
+              <div class="item-stock">7 Stück auf Lager</div>
+              <div class="item-extra">
+                <span class="energy-badge">B</span>
+                <a href="#" class="doc-link">Produktdatenblatt</a>
+              </div>
+              <div style="margin-top: 8px;">
+                <span class="delivery-pill">Lieferung Mo., 9. Nov.</span>
+              </div>
+            </div>
+            <div class="item-side">
+              <div class="item-qty">1 Stück</div>
+              <div class="item-price-old">259,00 €</div>
+              <div class="item-sale-badge">-5%</div>
+              <div class="item-price">244,99 €</div>
+            </div>
+          </div>
+
+          <!-- Item 2: Bosch Grinder -->
+          <div class="order-item">
+            <div class="item-img-wrap">
+              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="64" height="64">
+                <rect width="64" height="64" fill="#f4f5f7"/>
+                <rect x="20" y="10" width="12" height="40" rx="4" fill="#1a6bbf"/>
+                <rect x="18" y="12" width="4" height="20" rx="2" fill="#003087"/>
+                <circle cx="26" cy="52" r="8" fill="#333" stroke="#555" stroke-width="1"/>
+                <circle cx="26" cy="52" r="5" fill="#555"/>
+                <circle cx="26" cy="52" r="2" fill="#888"/>
+              </svg>
+            </div>
+            <div class="item-info">
+              <div class="item-name">Bosch GWS 12V-76 PROFESSIONAL, 19500 RPM, 7,6 cm, Akku, 2 Ah, 700 g</div>
+              <div class="item-seller">Verkauf und Versand durch <a href="#">Conrad Electronic</a></div>
+              <div class="item-sku">Bestell-Nr.: 2226383</div>
+              <div class="item-stock">38 Stück auf Lager</div>
+              <div style="margin-top: 8px;">
+                <span class="delivery-pill">Lieferung Mo., 9. Nov.</span>
+              </div>
+            </div>
+            <div class="item-side">
+              <div class="item-qty">2 Stück</div>
+              <div class="item-unit-price">Einzelpreis 224,99 €</div>
+              <div class="item-price">449,98 €</div>
+            </div>
+          </div>
+
+          <!-- Item 3: Bosch Spark plug -->
+          <div class="order-item">
+            <div class="item-img-wrap">
+              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="64" height="64">
+                <rect width="64" height="64" fill="#f4f5f7"/>
+                <rect x="28" y="8" width="8" height="30" rx="2" fill="#888"/>
+                <rect x="26" y="22" width="12" height="10" rx="1" fill="#666"/>
+                <rect x="30" y="38" width="4" height="16" rx="1" fill="#999"/>
+                <rect x="27" y="50" width="10" height="3" rx="1" fill="#777"/>
+              </svg>
+            </div>
+            <div class="item-info">
+              <div class="item-name">Bosch WR11E0 KSN602 02242215801 Zündkerze</div>
+              <div class="item-seller">Verkauf und Versand durch <a href="#">Conrad Electronic</a></div>
+              <div class="item-sku">Bestell-Nr.: 1647046</div>
+              <div class="item-stock">18 Stück auf Lager</div>
+              <div style="margin-top: 8px;">
+                <span class="delivery-pill">Lieferung Mo., 9. Nov.</span>
+              </div>
+            </div>
+            <div class="item-side">
+              <div class="item-qty">1 Stück</div>
+              <div class="item-price">7,49 €</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Bottom CTA -->
+        <div class="cta-wrap">
+          <p id="cta-approval-note" style="font-size: 13px; color: var(--fg-muted); margin: 0 0 14px; display: flex; align-items: flex-start; gap: 8px; display: none;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0; margin-top:1px;"><circle cx="8" cy="8" r="7" stroke="#d97706" stroke-width="1.5"/><path d="M8 5v4M8 11v.5" stroke="#d97706" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span>Diese Bestellung wird zur Genehmigung an <strong>m.schmidt@firma.de</strong> gesendet.</span>
+          </p>
+          <button class="btn-order" id="cta-btn" onclick="location.href='checkout-approval.html'">
+            Jetzt kaufen
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right: Order summary -->
+  <div class="order-summary">
+    <div class="summary-title">Ihre Bestellung</div>
+    <div class="summary-count">3 Artikel</div>
+
+    <div class="summary-row">
+      <span>Bruttopreis</span>
+      <span>702,46 €</span>
+    </div>
+    <div class="summary-row">
+      <span>Versand</span>
+      <span class="summary-free">Kostenfrei</span>
+    </div>
+
+    <hr class="summary-divider">
+
+    <div class="summary-row total">
+      <span>Gesamtpreis</span>
+      <span>702,46 €</span>
+    </div>
+    <div class="summary-vat">inkl. MwSt.</div>
+
+    <button class="btn-order-summary" id="cta-btn-summary" style="margin-top: 20px;" onclick="location.href='checkout-approval.html'">
+      Jetzt kaufen
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+
+    <div class="summary-legal">
+      Mit Ihrer Bestellung erklären Sie sich mit unseren <a href="#">AGB</a> und unserer <a href="#">Datenschutzerklärung</a> einverstanden.<br><br>
+      Aufgrund Ihrer Bestellung erhalten Sie Direktwerbung per E-Mail für ähnliche Produkte. Falls Sie keine weitere Werbung wünschen, teilen Sie uns dies bitte per E-Mail an folgende Adresse mit: <a href="#">kundenservice@conrad.de</a>. Für die Übermittlung Ihres Widerspruchs werden Ihnen keine über den Basistarif hinausgehende Kosten entstehen.
+    </div>
+  </div>
+</div>
+
+<!-- Footer trust bar -->
+<div class="footer-trust">
+  <div class="footer-trust-inner">
+    <div class="footer-trust-item">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5L5 9.5L11 3.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      1 - 4 Werktage Standardversand
+    </div>
+    <div class="footer-trust-item">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5L5 9.5L11 3.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Versandkostenfrei ab 119,00 € (netto 100,00 €)
+    </div>
+    <div class="footer-trust-item">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5L5 9.5L11 3.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Wie kann ich bezahlen?
+    </div>
+  </div>
+</div>
+
+<!-- Footer links -->
+<div class="footer-links">
+  <div class="footer-links-inner">
+    <div class="footer-link-item">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5L5 9.5L11 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Datenschutz
+    </div>
+    <div class="footer-link-item">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5L5 9.5L11 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Sichere Zahlungsmittel
+    </div>
+    <div class="footer-link-item">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5L5 9.5L11 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      SSL-Verschlüsselung
+    </div>
+    <div class="footer-link-item">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5L5 9.5L11 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Verified Visa &amp; Mastercard Source Code
+    </div>
+  </div>
+
+  <!-- Trust badges -->
+  <div class="footer-badges">
+    <!-- EHI -->
+    <svg width="60" height="60" viewBox="0 0 60 60"><circle cx="30" cy="30" r="30" fill="#c8102e"/><text x="30" y="22" text-anchor="middle" font-size="10" font-weight="800" fill="white" font-family="Arial">GEPRÜFTER</text><text x="30" y="34" text-anchor="middle" font-size="9" font-weight="800" fill="white" font-family="Arial">ONLINE-</text><text x="30" y="45" text-anchor="middle" font-size="9" font-weight="800" fill="white" font-family="Arial">SHOP</text></svg>
+    <!-- Ecommerce Europe -->
+    <svg width="60" height="60" viewBox="0 0 60 60"><circle cx="30" cy="30" r="30" fill="#003087"/><text x="30" y="22" text-anchor="middle" font-size="7" font-weight="700" fill="white" font-family="Arial">trust</text><text x="30" y="32" text-anchor="middle" font-size="7" font-weight="700" fill="white" font-family="Arial">ECOMMERCE</text><text x="30" y="41" text-anchor="middle" font-size="7" font-weight="700" fill="white" font-family="Arial">EUROPE</text><text x="30" y="50" text-anchor="middle" font-size="6" fill="#adc8ff" font-family="Arial">seit 2004</text></svg>
+    <!-- Idealo -->
+    <svg width="60" height="60" viewBox="0 0 60 60"><circle cx="30" cy="30" r="30" fill="#f7a600"/><text x="30" y="27" text-anchor="middle" font-size="9" font-weight="800" fill="white" font-family="Arial">idealo</text><text x="30" y="40" text-anchor="middle" font-size="7" fill="white" font-family="Arial">PARTNER</text></svg>
+    <!-- FuE BSFZ -->
+    <svg width="60" height="60" viewBox="0 0 60 60"><circle cx="30" cy="30" r="30" fill="#005f9e"/><text x="30" y="27" text-anchor="middle" font-size="10" font-weight="800" fill="white" font-family="Arial">FuE</text><text x="30" y="40" text-anchor="middle" font-size="8" fill="white" font-family="Arial">BSFZ</text></svg>
+    <!-- World Cup -->
+    <svg width="60" height="60" viewBox="0 0 60 60"><circle cx="30" cy="30" r="29" fill="white" stroke="#cfd4dd" stroke-width="1"/><text x="30" y="27" text-anchor="middle" font-size="7" fill="#003087" font-family="Arial">OFFICIAL</text><text x="30" y="38" text-anchor="middle" font-size="6" fill="#003087" font-family="Arial">SPONSOR</text></svg>
+    <!-- Conrad -->
+    <svg width="60" height="60" viewBox="0 0 60 60"><circle cx="30" cy="30" r="29" fill="white" stroke="#cfd4dd" stroke-width="1"/><text x="30" y="34" text-anchor="middle" font-size="8" font-weight="700" fill="#376EEF" font-family="Arial">CONRAD</text></svg>
+  </div>
+
+  <div class="footer-nav">
+    <a href="#">AGB</a>
+    <a href="#">Impressum</a>
+    <a href="#">Datenschutz</a>
+    <a href="#">Widerruf</a>
+  </div>
+</div>
+
+<script>
+  (function() {
+    var approval = false;
+    try { approval = sessionStorage.getItem('approvalRequested') === '1'; } catch(e) {}
+    var label = approval ? 'Zur Genehmigung einreichen' : 'Jetzt kaufen';
+    var dest = approval ? 'checkout-approval.html' : '#';
+    var arrowSvg = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    var btn = document.getElementById('cta-btn');
+    var btnS = document.getElementById('cta-btn-summary');
+    var note = document.getElementById('cta-approval-note');
+    if (btn) { btn.innerHTML = label + ' ' + arrowSvg; btn.setAttribute('onclick', "location.href='" + dest + "'"); }
+    if (btnS) { btnS.innerHTML = label + ' ' + arrowSvg; btnS.setAttribute('onclick', "location.href='" + dest + "'"); }
+    if (note) note.style.display = approval ? 'flex' : 'none';
+  })();
+</script>
