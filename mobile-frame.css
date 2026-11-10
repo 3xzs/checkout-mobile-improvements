@@ -1,12 +1,15 @@
 /* mobile-frame.css
-   Constrains every page to a phone-sized column centered on a neutral desktop background.
-   Link this in every HTML file — it is the single source of the mobile-only constraint. */
+   Mobile-only constraints for every page. On desktop, mobile-frame.js shows the page
+   inside the iPhone 16 frame (phone.html); these rules then style it for that screen.
+   Without the frame (narrow window, frame blocked), the page falls back to a
+   phone-sized column centered on a neutral background. */
 
-html {
+/* ── Fallback column (not inside the frame) ── */
+html:not(.in-phone) {
   background: #d8d8d8;
 }
 
-body {
+html:not(.in-phone) body {
   max-width: 430px;
   /* !important: each page's inline <style> resets body margin to 0, which left-aligned the frame */
   margin: 0 auto !important;
@@ -15,6 +18,52 @@ body {
   overflow-x: hidden;
   position: relative;
   background: #fff;
+}
+
+/* ── Inside the iPhone frame ──
+   An iframe reports no safe-area insets, so reserve room for the Dynamic Island
+   and the rounded screen corners by hand. */
+html.in-phone {
+  --safe-top: 54px;
+  --safe-bottom: 20px;
+  /* iOS scrollbars overlay the content; a desktop scrollbar would eat into the 393px width */
+  scrollbar-width: none;
+}
+
+html.in-phone::-webkit-scrollbar {
+  display: none;
+}
+
+html.in-phone body {
+  padding-top: var(--safe-top);
+  overflow-x: hidden;
+}
+
+/* Status-bar strip behind the Dynamic Island, in the header color */
+html.in-phone body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--safe-top);
+  background: var(--c-navy, #001F42);
+  z-index: 30;
+}
+
+/* Sticky header and stepper stick below the strip instead of under it */
+html.in-phone body .header {
+  top: var(--safe-top);
+}
+
+html.in-phone body .stepper {
+  top: calc(var(--safe-top) + var(--checkout-header-h));
+}
+
+/* Keep the bottom bars clear of the rounded screen corners */
+html.in-phone .sticky-cta,
+html.in-phone .confirm-actions {
+  padding-bottom: calc(16px + var(--safe-bottom));
 }
 
 /* Force single-column layout — collapse the two-column checkout grid unconditionally */
