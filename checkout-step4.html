@@ -789,7 +789,7 @@
     var approval = false;
     try { approval = sessionStorage.getItem('approvalRequested') === '1'; } catch(e) {}
     var label = approval ? 'Zur Genehmigung einreichen' : 'Jetzt kaufen';
-    var dest = approval ? 'checkout-approval.html' : '#';
+    var dest = approval ? 'checkout-approval.html' : 'checkout-confirmation.html';
     var arrowSvg = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     var btn = document.getElementById('cta-btn');
     var btnS = document.getElementById('cta-btn-summary');
@@ -825,7 +825,7 @@
   try { approval = sessionStorage.getItem("approvalRequested") === "1"; } catch(e) {}
   var btn = document.getElementById("sticky-cta-btn");
   if (btn) {
-    var dest = approval ? "checkout-approval.html" : "#";
+    var dest = approval ? "checkout-approval.html" : "checkout-confirmation.html";
     btn.firstChild.textContent = approval ? "Zur Genehmigung einreichen" : "Jetzt kaufen";
     btn.onclick = function() { location.href = dest; };
   }

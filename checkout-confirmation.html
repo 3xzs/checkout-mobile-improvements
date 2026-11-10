@@ -1,0 +1,419 @@
+<title>Conrad – Bestellung bestätigt</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="mobile-frame.css">
+<link rel="stylesheet" href="mobile-fixes.css">
+
+<style>
+  :root {
+    --c-blue: #376EEF;
+    --c-blue-hover: #2856c9;
+    --c-navy: #001F42;
+    --c-page-bg: #F4F5F7;
+    --c-text: #272C35;
+    --c-text-on-dark: #FEFEFF;
+    --c-text-secondary: #5a6171;
+    --c-text-tertiary: #666c7a;
+    --c-border: #cfd4dd;
+    --c-bg-white: #ffffff;
+    --c-bg-tint: #f8f9fb;
+    --c-success: #218972;
+    --c-success-bg: #E0F4EE;
+    --c-success-text: #0F3D2E;
+    --c-blue-tint: #eaf0fe;
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius-pill: 999px;
+    --bg: var(--c-page-bg);
+    --surface: var(--c-bg-white);
+    --fg: var(--c-text);
+    --fg-muted: var(--c-text-secondary);
+    --fg-faint: var(--c-text-tertiary);
+    --border: var(--c-border);
+    --accent: var(--c-blue);
+    --accent-hover: var(--c-blue-hover);
+    --green: var(--c-success);
+    --green-bg: var(--c-success-bg);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.5;
+  }
+
+  .header { background: var(--c-navy); color: var(--c-text-on-dark); padding: 16px 0; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; }
+  .header-inner { max-width: 1680px; margin: 0 auto; padding: 0 max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); display: flex; align-items: center; justify-content: space-between; }
+  .logo svg { width: 130px; height: auto; display: block; }
+  .secure-badge { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--c-text-on-dark); opacity: 0.85; }
+  .secure-badge svg { width: 18px; height: 18px; }
+
+  .main {
+    padding: 36px max(16px, env(safe-area-inset-left, 0px)) 180px;
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+
+  /* ── Hero ── */
+  .hero { text-align: center; margin-bottom: 28px; }
+  .hero-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-pill);
+    background: var(--green-bg);
+    border: 2px solid var(--green);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+  .hero-title { font-size: 24px; font-weight: 700; line-height: 1.25; margin: 0 0 10px; }
+  .hero-sub { font-size: 14px; color: var(--fg-muted); margin: 0 auto; max-width: 340px; line-height: 1.6; }
+  .hero-sub strong { color: var(--fg); font-weight: 600; }
+
+  /* ── Order card ── */
+  .order-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .order-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+  }
+  .order-card-head .order-no { font-variant-numeric: tabular-nums; }
+
+  .order-stats { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--border); }
+  .order-stat { padding: 14px 16px; }
+  .order-stat + .order-stat { border-left: 1px solid var(--border); }
+  .order-stat-label { font-size: 12px; color: var(--fg-muted); margin-bottom: 2px; }
+  .order-stat-val { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.2; }
+  .order-stat-note { font-size: 11px; color: var(--fg-faint); margin-top: 2px; }
+
+  .order-items { padding: 0 16px; }
+  .order-item {
+    display: grid;
+    grid-template-columns: 48px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .order-item:last-child { border-bottom: none; }
+  .item-img-wrap {
+    width: 48px;
+    height: 48px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xs);
+    overflow: hidden;
+    background: var(--c-bg-tint);
+  }
+  .item-img-wrap svg { width: 100%; height: 100%; display: block; }
+  .item-info { min-width: 0; }
+  .item-name {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .item-qty { font-size: 12px; color: var(--fg-muted); }
+  .item-price { font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  .delivery-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+  }
+  .delivery-pill {
+    display: inline-block;
+    background: var(--green-bg);
+    color: var(--c-success-text);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: var(--radius-xs);
+  }
+
+  /* ── Details toggle ── */
+  .details-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 14px 16px;
+    background: none;
+    border: none;
+    border-top: 1px solid var(--border);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    cursor: pointer;
+  }
+  .details-toggle svg { transition: transform 0.2s ease; }
+  .details-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+  .details { display: none; padding: 4px 16px 16px; border-top: 1px solid var(--border); }
+  .details.open { display: block; }
+  .details-section { padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .details-section:last-child { border-bottom: none; padding-bottom: 0; }
+  .details-label { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--fg-muted); margin-bottom: 4px; }
+  .details-val { font-size: 13px; color: var(--fg); }
+  .details-val .muted { color: var(--fg-muted); font-size: 12px; }
+  .sum-row { display: flex; justify-content: space-between; font-size: 13px; font-variant-numeric: tabular-nums; margin-bottom: 4px; }
+  .sum-row.total { font-weight: 700; font-size: 14px; margin-top: 6px; padding-top: 8px; border-top: 1px solid var(--border); }
+  .sum-free { color: var(--green); font-weight: 600; }
+
+  /* ── Info card (payment instructions) ── */
+  .info-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .info-card-body {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    background: var(--c-blue-tint);
+    font-size: 13px;
+    color: var(--fg);
+    line-height: 1.6;
+  }
+  .info-card-body svg { flex-shrink: 0; margin-top: 2px; }
+  .info-card-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 14px 16px;
+    border-top: 1px solid var(--border);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .info-card-link:hover { text-decoration: underline; }
+
+  /* ── Sticky actions ── */
+  .confirm-actions {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    background: #fff;
+    border-top: 1px solid #e5e7eb;
+    padding: 12px 16px calc(16px + env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .btn-primary,
+  .btn-secondary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .btn-primary { background: var(--accent); color: #fff; border: none; }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-secondary { background: var(--surface); color: var(--accent); border: 1px solid var(--accent); }
+  .btn-secondary:hover { background: var(--c-blue-tint); }
+</style>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-inner">
+    <a href="index.html" class="logo" aria-label="Conrad">
+      <svg width="160" height="40" viewBox="0 0 160 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip-cf)">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M37.7528 0L36.1809 6.88901H26.1698C16.9036 6.88901 11.8011 12.8209 11.8011 23.592C11.8011 30.5305 14.7584 33.1104 22.7123 33.1104H30.26L28.7167 40H15.5869C3.94266 40 0 36.3155 0 25.4795C0 16.6882 2.78962 8.76173 7.33826 4.55168C10.7957 1.36311 15.7071 0 23.7738 0H37.7528ZM39.3954 9.77778C46.1119 9.77778 48.5393 11.7969 48.5393 17.3328C48.5393 25.5503 43.8927 30.2212 35.7373 30.2212L23.4066 30.2222C16.6906 30.2222 14.382 28.463 14.382 23.3874C14.382 14.5638 18.7593 9.77778 26.7948 9.77778H39.3954ZM62.4173 9.77778L68.2557 21.5714L71.087 9.77778H79.1011L74.2156 30.2222H65.8731L58.8715 16.67L55.654 30.2222H47.6404L52.4967 9.77778H62.4173ZM96.6532 9.77778C103.594 9.77778 106.358 11.565 106.358 16.0066C106.358 20.1002 103.714 22.7535 98.696 23.7633L101.955 27.6459L110.708 16.093C115.223 10.109 115.616 9.79206 122.183 9.77834L133.034 9.77778L128.107 30.2222H119.633L120.504 26.5608H111.581L108.935 30.2222H100.47C95.7216 30.2222 95.5112 30.1077 93.1378 26.329L89.081 19.7836H95.0009C97.3438 19.7836 98.4857 18.8619 98.4857 17.0158C98.4857 15.7181 97.2241 15.026 94.8195 15.026H89.4427L85.7759 30.2222H77.3034L82.2305 9.77778H96.6532ZM151.633 9.77778C157.499 9.77778 160 11.9983 160 17.2465C160 25.7239 155.772 30.2222 147.82 30.2222H130.337L135.193 9.77778H151.633ZM29.7026 15.1981C25.3553 15.1981 22.8566 17.6208 22.8566 22.0329C22.8566 24.541 24.0369 25.2914 27.7833 25.2914L33.2493 25.292C37.3567 25.292 39.5759 22.8396 39.5759 18.2556C39.5759 15.8329 38.6768 15.1986 35.2291 15.1986L29.7026 15.1981ZM147.104 15.026H142.341L139.957 24.9751H145.676C149.19 24.9751 151.393 22.3796 151.393 18.2557C151.393 15.7181 150.47 15.026 147.104 15.026ZM123.019 15.026H122.449C119.834 15.026 119.293 15.3431 117.49 17.9678L114.967 21.5714H121.457L123.019 15.026Z" fill="#FEFEFF"></path>
+</g>
+<defs><clipPath id="clip-cf"><rect width="160" height="40" fill="white"></rect></clipPath></defs>
+</svg>
+    </a>
+    <div class="secure-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Sicher einkaufen
+    </div>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M7 14.5l4.5 4.5L21 9.5" stroke="#218972" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <h1 class="hero-title">Vielen Dank!<br>Ihre Bestellung ist bestätigt</h1>
+    <p class="hero-sub">Wir haben Ihre Bestellung erhalten und bereiten sie für den Versand vor. Eine Bestätigung wurde an <strong>simon.gussing@firma.de</strong> gesendet.</p>
+  </div>
+
+  <!-- Order card -->
+  <div class="order-card">
+    <div class="order-card-head">
+      <span>Conrad Electronic</span>
+      <span class="order-no">Bestellung #8104 2763</span>
+    </div>
+
+    <div class="order-stats">
+      <div class="order-stat">
+        <div class="order-stat-label">Gesamtpreis</div>
+        <div class="order-stat-val">702,46 €</div>
+        <div class="order-stat-note">inkl. MwSt.</div>
+      </div>
+      <div class="order-stat">
+        <div class="order-stat-label">Bestelldatum</div>
+        <div class="order-stat-val">5. Nov.</div>
+        <div class="order-stat-note">3 Artikel</div>
+      </div>
+    </div>
+
+    <div class="order-items">
+      <div class="order-item">
+        <div class="item-img-wrap">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" fill="#f4f5f7"/>
+            <rect x="10" y="14" width="44" height="28" rx="2" fill="#222" stroke="#444" stroke-width="1"/>
+            <rect x="12" y="16" width="40" height="24" fill="#1a6bbf"/>
+            <rect x="26" y="42" width="12" height="4" fill="#555"/>
+            <rect x="20" y="46" width="24" height="2" rx="1" fill="#444"/>
+            <text x="32" y="31" text-anchor="middle" font-size="6" fill="white" font-family="Arial">ASUS</text>
+          </svg>
+        </div>
+        <div class="item-info">
+          <div class="item-name">Asus MB14AC LED-Monitor 35,6 cm (14 Zoll)</div>
+          <div class="item-qty">1 Stück</div>
+        </div>
+        <div class="item-price">244,99 €</div>
+      </div>
+
+      <div class="order-item">
+        <div class="item-img-wrap">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" fill="#f4f5f7"/>
+            <rect x="20" y="10" width="12" height="40" rx="4" fill="#1a6bbf"/>
+            <rect x="18" y="12" width="4" height="20" rx="2" fill="#003087"/>
+            <circle cx="26" cy="52" r="8" fill="#333" stroke="#555" stroke-width="1"/>
+            <circle cx="26" cy="52" r="5" fill="#555"/>
+            <circle cx="26" cy="52" r="2" fill="#888"/>
+          </svg>
+        </div>
+        <div class="item-info">
+          <div class="item-name">Bosch GWS 12V-76 PROFESSIONAL</div>
+          <div class="item-qty">2 Stück</div>
+        </div>
+        <div class="item-price">449,98 €</div>
+      </div>
+
+      <div class="order-item">
+        <div class="item-img-wrap">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" fill="#f4f5f7"/>
+            <rect x="28" y="8" width="8" height="30" rx="2" fill="#888"/>
+            <rect x="26" y="22" width="12" height="10" rx="1" fill="#666"/>
+            <rect x="30" y="38" width="4" height="16" rx="1" fill="#999"/>
+            <rect x="27" y="50" width="10" height="3" rx="1" fill="#777"/>
+          </svg>
+        </div>
+        <div class="item-info">
+          <div class="item-name">Bosch WR11E0 Zündkerze</div>
+          <div class="item-qty">1 Stück</div>
+        </div>
+        <div class="item-price">7,49 €</div>
+      </div>
+    </div>
+
+    <div class="delivery-row">
+      <span class="delivery-pill">Lieferung voraussichtlich Mo., 9. Nov.</span>
+    </div>
+
+    <div class="details" id="order-details">
+      <div class="details-section">
+        <div class="sum-row"><span>Bruttopreis</span><span>702,46 €</span></div>
+        <div class="sum-row"><span>Versand</span><span class="sum-free">Kostenfrei</span></div>
+        <div class="sum-row total"><span>Gesamtpreis (inkl. MwSt.)</span><span>702,46 €</span></div>
+      </div>
+      <div class="details-section">
+        <div class="details-label">Lieferadresse</div>
+        <div class="details-val">Leopoldstraße 100, 80802 München<br><span class="muted">Warenempfänger: Thomas Müller · Standardversand</span></div>
+      </div>
+      <div class="details-section">
+        <div class="details-label">Rechnungsadresse</div>
+        <div class="details-val">Simon Gussing<br>Balanstraße 23, 81669 München<br><span class="muted">Kostenstelle: IT-Infrastruktur · Ref: 2024-Q4-089</span></div>
+      </div>
+      <div class="details-section">
+        <div class="details-label">Zahlung</div>
+        <div class="details-val">Vorauskasse</div>
+      </div>
+    </div>
+
+    <button class="details-toggle" id="details-toggle" aria-expanded="false" aria-controls="order-details" onclick="toggleDetails()">
+      <span id="details-toggle-label">Details anzeigen</span>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+  <!-- Payment info card -->
+  <div class="info-card">
+    <div class="info-card-body">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8.5" stroke="#376EEF" stroke-width="1.6"/><path d="M10 9v5M10 6.2v.3" stroke="#376EEF" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>Bitte überweisen Sie <strong>702,46 €</strong> mit dem Verwendungszweck <strong>8104 2763</strong>. Wir versenden Ihre Bestellung, sobald die Zahlung eingegangen ist.</span>
+    </div>
+    <a href="#" class="info-card-link">
+      Bankverbindung anzeigen
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </div>
+
+</div>
+
+<!-- Sticky actions -->
+<div class="confirm-actions">
+  <a href="index.html" class="btn-primary">Weiter einkaufen</a>
+  <a href="#" class="btn-secondary">Zu meinen Bestellungen</a>
+</div>
+
+<script>
+function toggleDetails() {
+  var d = document.getElementById("order-details");
+  var t = document.getElementById("details-toggle");
+  var open = d.classList.toggle("open");
+  t.setAttribute("aria-expanded", open);
+  document.getElementById("details-toggle-label").textContent = open ? "Details ausblenden" : "Details anzeigen";
+}
+</script>
