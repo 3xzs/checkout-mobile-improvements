@@ -15,3 +15,23 @@ body {
   position: relative;
   background: #fff;
 }
+
+/* Force single-column layout — collapse the two-column checkout grid unconditionally */
+.main,
+.checkout-wrap,
+.checkout-layout {
+  display: block !important;
+  grid-template-columns: unset !important;
+}
+
+/* Hide the desktop order-summary sidebar — the sticky CTA shows the total instead */
+.order-summary {
+  display: none !important;
+}
+
+/* Ensure the step cards fill the full width */
+.steps-col,
+.checkout-steps {
+  width: 100% !important;
+  max-width: 100% !important;
+}
