@@ -8,9 +8,10 @@
 }
 
 /* Push page content up so it isn't hidden behind the sticky bar */
+.main,
 .checkout-wrap,
 .checkout-layout {
-  padding-bottom: 130px;
+  padding-bottom: 150px !important;
 }
 
 /* ── Sticky bar container ── */
