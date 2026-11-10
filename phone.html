@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conrad Checkout – iPhone 16</title>
+<style>
+  /* iPhone 16: 393 × 852 pt screen */
+  :root {
+    --screen-w: 393px;
+    --screen-h: 852px;
+    --bezel: 12px;
+    --screen-radius: 55px;
+  }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: #d8d8d8;
+  }
+
+  /* Centered on both axes; scaled down by the script below when the window is too small */
+  .device {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: var(--screen-w);
+    height: var(--screen-h);
+    padding: var(--bezel);
+    border-radius: calc(var(--screen-radius) + var(--bezel));
+    background: #111;
+    box-shadow:
+      inset 0 0 0 2px #2b2b2b,
+      0 30px 80px rgba(0, 0, 0, 0.28);
+  }
+
+  .screen {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--screen-radius);
+    overflow: hidden;
+    background: #fff;
+  }
+
+  .screen iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .island {
+    position: absolute;
+    top: 11px;
+    left: 50%;
+    width: 125px;
+    height: 37px;
+    margin-left: -62.5px;
+    border-radius: 999px;
+    background: #000;
+    z-index: 1;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<div class="device" id="device">
+  <div class="screen">
+    <div class="island"></div>
+    <iframe id="screen" title="Checkout"></iframe>
+  </div>
+</div>
+
+<script>
+  const device = document.getElementById('device');
+  const frame = document.getElementById('screen');
+
+  // Only plain local page names, e.g. "checkout-step2.html?x=1"
+  function pageFromHash() {
+    const page = decodeURIComponent(location.hash.slice(1));
+    return /^[\w-]+\.html(\?.*)?$/.test(page) ? page : 'index.html';
+  }
+
+  frame.src = pageFromHash();
+  window.addEventListener('hashchange', () => { frame.src = pageFromHash(); });
+
+  // The framed page reports itself on load; mirror it in the URL so a reload keeps the step
+  window.addEventListener('message', (e) => {
+    if (e.source !== frame.contentWindow || !e.data || e.data.type !== 'phone-frame-page') return;
+    history.replaceState(null, '', '#' + e.data.page);
+  });
+
+  function fit() {
+    const margin = 24;
+    const scale = Math.min(
+      1,
+      (innerWidth - margin * 2) / device.offsetWidth,
+      (innerHeight - margin * 2) / device.offsetHeight
+    );
+    device.style.transform = `translate(-50%, -50%) scale(${scale})`;
+  }
+  fit();
+  window.addEventListener('resize', fit);
+</script>
+</body>
+</html>
