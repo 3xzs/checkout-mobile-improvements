@@ -5,6 +5,8 @@
 <link rel="stylesheet" href="mobile-frame.css">
 <link rel="stylesheet" href="mobile-fixes.css">
 <link rel="stylesheet" href="sticky-cta.css">
+<link rel="stylesheet" href="checkout-mobile.css">
+<script src="checkout-mobile.js" defer></script>
 
 <style>
   :root {
@@ -324,46 +326,45 @@
   </div>
 </header>
 
+<!-- Step progress -->
+<nav class="stepper" aria-label="Fortschritt">
+  <div class="stepper-label">
+    <span class="stepper-title">Zahlung</span>
+    <span class="stepper-count">Schritt 3 von 4</span>
+  </div>
+  <ol class="stepper-track" aria-hidden="true">
+    <li class="stepper-seg done"></li>
+    <li class="stepper-seg done"></li>
+    <li class="stepper-seg current"></li>
+    <li class="stepper-seg"></li>
+  </ol>
+</nav>
+
 <!-- Main -->
 <div class="main">
   <div>
 
-    <!-- Step 1: Completed -->
-    <div class="step-card">
-      <div class="step-header">
-        <span class="step-num">1</span>
-        <div class="step-summary">
-          <div class="step-summary-title">Rechnungsadresse</div>
-          <div class="step-summary-detail">
-            Simon Gussing<br>
-            Balanstraße 23<br>
-            81669 München<br>
-            Deutschland
-          </div>
-          <div class="step-summary-detail" style="margin-top: 8px;">Rechnung per E-Mail</div>
+    <!-- Completed steps -->
+    <div class="done-group">
+      <div class="done-row">
+        <svg class="done-check" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="9" fill="currentColor"/><path d="M6 10.2l2.6 2.6L14 7.4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="done-text">
+          <div class="done-title">Rechnungsadresse</div>
+          <div class="done-detail">Simon Gussing</div>
+          <div class="done-detail"><span>Balanstraße 23,</span> <span>81669 München</span></div>
+          <div class="done-detail minor">Rechnung per E-Mail</div>
         </div>
-        <button class="step-edit-btn" onclick="location.href='checkout-step1.html'">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Ändern
-        </button>
+        <button class="done-edit" aria-label="Rechnungsadresse ändern" onclick="location.href='checkout-step1.html'">Ändern</button>
       </div>
-    </div>
-
-    <!-- Step 2: Completed -->
-    <div class="step-card">
-      <div class="step-header">
-        <span class="step-num">2</span>
-        <div class="step-summary">
-          <div class="step-summary-title">Lieferung</div>
-          <div class="step-summary-detail">
-            Lieferadresse ist gleich Rechnungsadresse
-          </div>
-          <div class="step-summary-detail" style="margin-top: 4px;">Standardversand</div>
+      <div class="done-row">
+        <svg class="done-check" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="9" fill="currentColor"/><path d="M6 10.2l2.6 2.6L14 7.4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="done-text">
+          <div class="done-title">Lieferung</div>
+          <div class="done-detail">Simon Gussing</div>
+          <div class="done-detail"><span>Balanstraße 23,</span> <span>81669 München</span></div>
+          <div class="done-detail minor">Standardversand · Kostenfrei</div>
         </div>
-        <button class="step-edit-btn" onclick="location.href='checkout-step2.html'">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Ändern
-        </button>
+        <button class="done-edit" aria-label="Lieferung ändern" onclick="location.href='checkout-step2.html'">Ändern</button>
       </div>
     </div>
 
@@ -449,14 +450,6 @@
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
         </div>
-      </div>
-    </div>
-
-    <!-- Step 4: Bestellübersicht -->
-    <div class="step-card inactive">
-      <div class="step-header">
-        <span class="step-num">4</span>
-        Bestellübersicht
       </div>
     </div>
 

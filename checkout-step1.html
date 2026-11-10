@@ -5,6 +5,8 @@
 <link rel="stylesheet" href="mobile-frame.css">
 <link rel="stylesheet" href="mobile-fixes.css">
 <link rel="stylesheet" href="sticky-cta.css">
+<link rel="stylesheet" href="checkout-mobile.css">
+<script src="checkout-mobile.js" defer></script>
 
 <style>
   :root {
@@ -427,6 +429,20 @@
   </div>
 </header>
 
+<!-- Step progress -->
+<nav class="stepper" aria-label="Fortschritt">
+  <div class="stepper-label">
+    <span class="stepper-title">Rechnungsadresse</span>
+    <span class="stepper-count">Schritt 1 von 4</span>
+  </div>
+  <ol class="stepper-track" aria-hidden="true">
+    <li class="stepper-seg current"></li>
+    <li class="stepper-seg"></li>
+    <li class="stepper-seg"></li>
+    <li class="stepper-seg"></li>
+  </ol>
+</nav>
+
 <!-- Main -->
 <div class="main">
   <!-- Left: Checkout steps -->
@@ -610,30 +626,6 @@
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
         </div>
-      </div>
-    </div>
-
-    <!-- Step 2: Lieferung -->
-    <div class="step-card">
-      <div class="step-header">
-        <span class="step-num">2</span>
-        Lieferung
-      </div>
-    </div>
-
-    <!-- Step 3: Zahlung -->
-    <div class="step-card">
-      <div class="step-header">
-        <span class="step-num">3</span>
-        Zahlung
-      </div>
-    </div>
-
-    <!-- Step 4: Bestellübersicht -->
-    <div class="step-card">
-      <div class="step-header">
-        <span class="step-num">4</span>
-        Bestellübersicht
       </div>
     </div>
 
